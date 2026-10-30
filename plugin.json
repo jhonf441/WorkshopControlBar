@@ -2,7 +2,7 @@
   "id": "WorkshopControlBar",
   "name": "Control Bar",
   "author": "jhonf441",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/jhonf441/WorkshopControlBar",
   "tags": [
@@ -13,6 +13,24 @@
   "dwcDependencies": [
     "WorkshopService"
   ],
-  "sbcRequired": false,
-  "data": {}
+  "sbcRequired": true,
+  "sbcDsfVersion": "3.6",
+  "data": {},
+  "sdFiles": [
+    "sys/workshop/examples/WorkshopControlBar/macros/laser/air_off_sync.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/laser/air_on_sync.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/light_off_sync.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/light_on_sync.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/lightoff.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/lighton.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/power/full-reset.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/power/shutdown-after-job.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/power/shutdown-all.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/psu/start.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/psu/stop.g"
+  ],
+  "dwcFiles": [
+    "js/WorkshopControlBar.ead5cde4.js",
+    "js/WorkshopControlBar.ead5cde4.js.gz"
+  ]
 }

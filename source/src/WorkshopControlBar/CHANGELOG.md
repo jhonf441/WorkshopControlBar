@@ -1,5 +1,9 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.3 -- 2026-10-30
+
+- Manifest: sbcRequired true (needs WorkshopService); side bar keeps the group names
+
 ## 2.7.2 -- 2026-10-29
 
 - Phone layout: 44 px touch targets in the section bars (family css), camera and Jog panels fit the screen

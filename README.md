@@ -30,6 +30,23 @@ Picture 1: the bar open at the right of a DWC page ("Controls"), scrolled to its
 - How: nothing to press; it updates by itself.
 - Watch out: it only reads. When the bar is collapsed to the arrow, the arrow takes the state color.
 
+![State in the open bar](img/10-bar-state-open-panel.png)
+
+Picture 10: the open bar (red rectangle): the colored dot, the name of the state ("POWER SUPPLY OFF (no power in the motors)") and, under it, the other active states ("RS485 warning (device with no axis)") and the machine mode. The dot blinks or pulses like the status light.
+
+#### State on the arrow and on the rail
+- What: when the bar is closed the state does not disappear: the arrow takes the colors of the status light as stripes, and the rail shows a round indicator (a pie with the same colors) above its icons.
+- Where: the arrow tab at the right edge of the page (picture 11, red rectangle) and the round indicator at the top of the rail (picture 12, small red rectangle).
+- How: read it; press the arrow or the indicator to open the bar. In the gear options, "State (color and effect) on the arrow" switches it on or off.
+
+![State on the arrow](img/11-bar-arrow-shows-the-state.png)
+
+Picture 11: the bar closed as an arrow: the stripes are the colors of the status light (here amber, blue and green, as in picture 10).
+
+![Icon rail](img/12-bar-icon-rail-closed.png)
+
+Picture 12: the bar closed as an icon rail (large red rectangle): the arrow to open it, the round state indicator (small rectangle), the live job stop, the screen buttons (camera, jog) under LOCAL and the global ones (groups, camera relay, power, timer, alerts) under GLOBAL. The page makes room for it.
+
 ![Bar top](img/02-bar-status-and-panels.png)
 
 Picture 2: top of the bar: title row with ">" and the gear; state line; live job strip with "Stop"; state "Busy"; "THIS SCREEN" with Camera and Jog; "MY BUTTONS" chips.
@@ -38,7 +55,7 @@ Picture 2: top of the bar: title row with ">" and the gear; state line; live job
 - What: hides the bar so the page uses the full width, and shows it again.
 - Where: ">" button at the top left of the bar (picture 2). When collapsed, a small arrow tab at the right edge of the page (picture 9, middle right).
 - How: 1. Press ">" to collapse. 2. Press the arrow tab to open it again.
-- Watch out: it is a preference of this screen only. The style when collapsed (arrow or icon rail) is chosen in the gear options.
+- Watch out: it is a preference of this screen only. The style when collapsed (arrow, picture 11, or icon rail, picture 12) is chosen in the gear options.
 
 ![Collapsed bar](img/09-bar-collapsed-arrow.png)
 
@@ -170,10 +187,10 @@ Picture 5: gear open: "Configure the bar (this screen only)", the "Start-up" but
 Picture 6: gear options: "When closed" (Icon rail / Arrow only), "Automatic collapse", "Make room for the bar" and the status lights option.
 
 #### Style when closed (Icon rail or Arrow only)
-- What: "Icon rail" leaves a narrow strip of icons; "Arrow only" hides the bar and leaves a small arrow on the edge.
+- What: "Icon rail" leaves a narrow strip of icons (picture 12); "Arrow only" hides the bar and leaves a small arrow on the edge (picture 11).
 - Where: gear > "Options" > "When closed" (picture 6, top).
 - How: choose one of the two buttons.
-- Watch out: either way it opens with a tap, floating over the page.
+- Watch out: either way it opens with a tap, floating over the page. The rail needs to make room (next function): with "Make room for the bar" off, the rail becomes the arrow.
 
 #### Automatic collapse (close on mouse out)
 - What: when on, the bar closes by itself when the mouse leaves it or you tap outside it.
@@ -181,9 +198,14 @@ Picture 6: gear options: "When closed" (Icon rail / Arrow only), "Automatic coll
 - How: tick or untick.
 
 #### Make room for the bar
-- What: on, the DWC page narrows so the bar does not cover content (on a very narrow screen the bar floats). Off, the bar floats over the page.
+- What: on, the DWC page narrows so the bar does not cover content (on a very narrow screen the bar floats). Off, the bar floats over the page and, closed, it becomes the arrow.
 - Where: gear > Options > "Make room for the bar" (picture 6).
 - How: tick or untick.
+- Compare: on (picture 10): the cards of the page narrow and nothing is under the bar. Off (picture 13): the bar covers what is under it, like the "Speed Factor" card.
+
+![Bar floating over the page](img/13-bar-floating-over-the-page.png)
+
+Picture 13: "Make room for the bar" off: the open bar (red rectangle) floats over the page and covers part of it.
 
 #### Status lights, arrow state, compact and collapsible cards
 - What: "Status lights at the top of the bar" (the header status), "State (color and effect) on the arrow", "Safe stop of the live job on the bar", "Compact: no explanation texts", "Collapsible cards (tap the title)".
