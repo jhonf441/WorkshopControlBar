@@ -1,0 +1,18 @@
+{
+  "id": "WorkshopControlBar",
+  "name": "Control Bar",
+  "author": "jhonf441",
+  "version": "2.7.2",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/jhonf441/WorkshopControlBar",
+  "tags": [
+    "sidebar",
+    "power"
+  ],
+  "dwcVersion": "3.6",
+  "dwcDependencies": [
+    "WorkshopService"
+  ],
+  "sbcRequired": false,
+  "data": {}
+}
