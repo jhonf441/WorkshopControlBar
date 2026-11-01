@@ -6,15 +6,14 @@
       // the screen (top:0/bottom:0) and collapsible with a button.
       //
       // Conceptual organization -- do NOT mix, it is the whole point:
-      //   THIS SCREEN (blue): launchers of Jog and Camera -> open/
+      //   THIS SCREEN (blue): the launchers the plugins register -> open/
       //     close their floating panel. This screen only; they do not stop
       //     any process nor affect other screens.
-      //   GLOBAL (orange): Camera relay (process on the Pi) and Shutdown
-      //     (now / when finished). They affect the machine and ALL the
-      //     screens.
-      //   Closing the camera != stopping the relay; closing the jog != stopping anything
-      //   global (it only releases what is held); Shut down when finished !=
-      //   Shut down now.
+      //   GLOBAL (orange): Phone notifications and Shutdown (now / when
+      //     finished). They affect the machine and ALL the screens.
+      //   Nothing of another plugin lives here: the bar only draws what is in the registry (window.__workshop.panels).
+      //   Closing the jog != stopping anything global (it only releases what is
+      //   held); Shut down when finished != Shut down now.
       //
       // v3 (2026-10-08, decided with the user): there are no more round
       // floating buttons -- the panels still float, but they are opened
@@ -22,11 +21,11 @@
       // because the circles got in the way): closing a panel now leaves nothing behind.
       //
       // Collapsed: a SIDEBAR_RAIL_W px rail with icons (tooltip via
-      // title). The LOCAL launchers (jog, camera) open/close their
+      // title). The LOCAL launchers (the registered panels) open/close their
       // panel with one tap -- it is harmless and it is their reason for being. The
       // GLOBAL ones do NOT execute anything from the rail: they open the bar on their
-      // section (on a rail without text it is far too easy to tap "stop
-      // relay" or "shut down" thinking it is something else). The bar NEVER moves
+      // section (on a rail without text it is far too easy to tap "mute"
+      // or "shut down" thinking it is something else). The bar NEVER moves
       // DWC's layout: it always floats over the page and starts below DWC's
       // top bar (sbPlace), so it does not cover "Emergency stop".
       // The content scrolls INSIDE the bar; the collapse
@@ -38,7 +37,6 @@
       var SIDEBAR_EXPANDED_W = 300;
       var SIDEBAR_LOCAL_COLOR = "#42a5f5";
       var SIDEBAR_GLOBAL_COLOR = "#ff9800";
-      var RELAY_PROBE_MS = 30000; // F3-J: every open browser used to ask :8090 every 10 s; the service does not publish the camera state, so 30 s and only where the relay card is seen
 
       var sidebarEl = null;
       var sidebarCollapsed = true;
@@ -66,22 +64,11 @@
       var sbTimingArmed = null; // {min, btn, timer}: primer toque de "Apagar en..." (el segundo confirma)
       var sbMachineStatus = null;
       var sbJobFile = null;
-      var sbRelayState = "unknown"; // "running" | "stopped" | "unknown" | "nocam"
-      var sbRelayMsg = "";
-      // Timelapse (2026-10-10, "I want a timelapse button in the
-      // controls panel"): state from the relay's /estado, only with the bar open
-      var sbTl = null; // {grabando, trabajo, cuadros, manual, armando, ...}
-      var sbTlHost = null;
-      var sbTlMsg = "";
       var sbShutdownMsg = "";
-      var sbRelayArmTimer = null;
-      var sbRelayProbeTimer = null;
 
-      // The bar's own icons. Those of the panels (camera, jog) are
+      // The bar's own icons. Those of the panels are
       // brought by each plugin when it registers (api.icon).
       var SB_ICONS = {
-        relay:
-          '<path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>',
         power:
           '<path d="M13 3h-2v10h2V3zm4.83 2.17-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>',
         timer:
@@ -295,7 +282,7 @@
 
       // Icon of the collapsed rail. Tap = open the bar on that section
       // (see big comment above: the rail never executes actions).
-      // `onTap` (only for the LOCAL launchers of jog/camera): instead
+      // `onTap` (only for the LOCAL launchers of the registered panels): instead
       // of opening the bar, it executes directly -- opening/closing a panel of
       // this screen is harmless. The GLOBAL ones never pass it.
       function sbMakeRailBtn(iconName, title, targetKey, onTap) {
@@ -597,13 +584,6 @@
         sbT(sb.toggle, c ? "<" : ">");
         sb.toggle.title = c ? i18nT('sidebar.open_control_bar') : i18nT('sidebar.collapse_control_bar');
         sb.toggle.setAttribute("aria-label", sb.toggle.title);
-        if (!c) {
-          sidebarProbeRelay();
-          if (!sbRelayProbeTimer) sbRelayProbeTimer = setInterval(sidebarProbeRelay, RELAY_PROBE_MS);
-        } else if (sbRelayProbeTimer) {
-          clearInterval(sbRelayProbeTimer);
-          sbRelayProbeTimer = null;
-        }
         sidebarRefresh();
         if (morphFrom) ledMorph(morphFrom, ledMorphCircleBox, 230); // the bar needs its 180 ms slide to be where it will stay
         else if (morphCircle) ledMorph(morphCircle, sbArrowRect, 30);
@@ -615,6 +595,7 @@
 
         var bar = document.createElement("div");
         bar.id = SIDEBAR_ID;
+        bar.setAttribute("data-workshop-float", "1"); // a floating widget: the Jog hides every one of them in its full screen
         bar.style.cssText = [
           "position:fixed",
           "top:0",
@@ -666,8 +647,6 @@
         sb.gGlobal = gGlobal; // estilo Oculta: tarjetas de estado + detalle
         sbOrderRegister("global", gGlobal);
 
-        sbBuildRelayCard(gGlobal);
-
         sbBuildNoticeCard(gGlobal);
 
         sbBuildPowerCard(gGlobal);
@@ -681,7 +660,6 @@
         document.body.appendChild(bar);
         sbOrderApplyAll();
         sidebarSetCollapsed(isSidebarCollapsed());
-        sidebarProbeRelay();
       }
 
       // Updates EVERYTHING visible of the bar from the current state.
@@ -764,7 +742,6 @@
             })
             .join(" · ");
 
-        sbPaintRelay();
         var pv = sbPowerView();
         sbPaintShutdownState(pv);
         sbPaintPowerMethod(pv);

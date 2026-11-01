@@ -44,9 +44,7 @@
 
       // the state is shown only while the Lights and status plugin is installed and enabled (stopped = nothing is painted)
       function ledLightsActive() {
-        if (!workshopPathExists("/Plugins/Lights")) return false;
-        var l = workshopHostEnabledPlugins();
-        return !Array.isArray(l) || l.indexOf("WorkshopLights") >= 0;
+        return workshopPluginActive("lights");
       }
 
       // The layer of the arrow tab follows how the states combine (Lights > "When several are active"):

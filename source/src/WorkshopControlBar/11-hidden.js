@@ -2,8 +2,8 @@
       // "Hidden bar: complete redesign": "yes, program it like that") ----
       //
       // Home: machine state, THIS SCREEN as large switches
-      // (Jog, Camera...), MY BUTTONS with chips to filter by
-      // group, GLOBAL as status cards (Relay, Notices, Shutdown) and
+      // (the registered panels), MY BUTTONS with chips to filter by
+      // group, GLOBAL as status cards (Notices, Shutdown) and
       // "Shut down now" separate at the bottom. Tapping a global card opens its
       // DETAIL in the same panel (the usual card, with an arrow to go
       // back): nothing of what they do is duplicated; only how it is seen
@@ -94,11 +94,10 @@
         oc.bottom.appendChild(ocLbl(i18nT('hidden.global_affects_everyone'), SIDEBAR_GLOBAL_COLOR));
         var gg = ocEl("div", "display:grid;grid-template-columns:1fr 1fr;gap:8px;");
         oc.bottom.appendChild(gg);
-        oc.tRelay = ocTile(function () { ocIr("relayCard"); });
         oc.tNotices = ocTile(function () { ocIr("notificationCard"); });
         oc.tShutdown = ocTile(function () { ocIr("powerCard"); });
-        oc.tShutdown.style.gridColumn = "span 2";
-        [[oc.tRelay, "relay", i18nT('hidden.relay')], [oc.tNotices, "bell", i18nT('hidden.notifications')], [oc.tShutdown, "timer", i18nT('sidebar.shutdown')]].forEach(function (x) {
+        oc.tNotices.style.gridColumn = oc.tShutdown.style.gridColumn = "span 2";
+        [[oc.tNotices, "bell", i18nT('hidden.notifications')], [oc.tShutdown, "timer", i18nT('sidebar.shutdown')]].forEach(function (x) {
           sbH(x[0]._ic, sbIconSvg(x[1], 18, false));
           sbT(x[0]._tit, x[2]);
           sbT(x[0]._chev, ">");
@@ -120,11 +119,13 @@
 
         // group filter: a CSS rule that is rewritten when choosing a chip
         oc.filterCss = document.createElement("style");
+        oc.filterCss.id = "workshop-bar-oc-filter-css"; // an id so that the stop of the plugin can take it out (BAR_OWN_STYLES, 20-main.js)
         document.head.appendChild(oc.filterCss);
         if (sb.btnCard) sb.btnCard.dataset.ocBtnsec = "1";
         if (sb.btnGroups) sb.btnGroups.dataset.ocFilter = "1";
         var B = "#" + SIDEBAR_ID + '[data-oc-view="start"]';
         var st = document.createElement("style");
+        st.id = "workshop-bar-oc-css";
         st.textContent = [
           // on the home: no help texts nor the BUTTONS title (the chips replace it)
           B + " [data-sb-help]{display:none!important;}",
@@ -220,7 +221,7 @@
           oc.top.style.display = oc.bottom.style.display = "flex";
           ocHide(sb.gLocal);
           ocHide(sb.gGlobal);
-          [sb.relayCard, sb.notificationCard, sb.powerCard].forEach(ocHide);
+          [sb.notificationCard, sb.powerCard].forEach(ocHide);
           ocChips();
           ocFilter();
           return;
@@ -228,7 +229,7 @@
         // detail: only that card (and the chain up to sb.full), with the arrow
         oc.top.style.display = oc.bottom.style.display = "none";
         oc.back.style.display = "flex";
-        sbT(oc.backTit, { relayCard: i18nT('hidden.camera_relay'), notificationCard: i18nT('sidebar.phone_notifications'), powerCard: i18nT('sidebar.shutdown') }[ocView] || "");
+        sbT(oc.backTit, { notificationCard: i18nT('sidebar.phone_notifications'), powerCard: i18nT('sidebar.shutdown') }[ocView] || "");
         var n = card;
         while (n && n !== sb.full) {
           var p = n.parentNode;
@@ -249,7 +250,9 @@
         resuming: [i18nT('hidden.resuming'), "rgba(66,165,245,0.2)", "#90caf9", "info"],
         busy: [i18nT('hidden.busy'), "rgba(255,152,0,0.2)", "#ffb74d", "warn"],
         halted: [i18nT('hidden.halted'), "rgba(239,83,80,0.2)", "#ef9a9a", "err"],
-        off: [i18nT('hidden.disconnected'), "rgba(158,158,158,0.2)", "#cfd8dc", ""],
+        // RRF "off": the board has no motor power (Vin low), DWC and the Pi are connected. "disconnected" is the real loss of the connection.
+        off: [i18nT('hidden.machine_off'), "rgba(158,158,158,0.2)", "#cfd8dc", ""],
+        disconnected: [i18nT('hidden.disconnected'), "rgba(158,158,158,0.2)", "#cfd8dc", ""],
       };
 
       // Dashboard data (from sidebarRefresh)
@@ -300,13 +303,6 @@
           });
 
         // global
-        var rel = { running: [i18nT('hidden.running'), "#a5d6a7"], stopped: [i18nT('hidden.stopped'), "#ef9a9a"], nocam: [i18nT('hidden.no_camera'), "#b0bec5"] }[sbRelayState] || [i18nT('hidden.no_data'), "#b0bec5"];
-        sbT(oc.tRelay._est, rel[0]);
-        oc.tRelay._est.style.color = rel[1];
-        if (sbRelayState === "running" && sbTl && sbTl.recording) {
-          sbT(oc.tRelay._est, i18nT('hidden.recording_timelapse'));
-          oc.tRelay._est.style.color = "#ef9a9a";
-        }
         var sil = sbNoticeMuted();
         sbT(oc.tNotices._est, !sbNotice ? i18nT('hidden.no_data') : sil ? i18nT('hidden.muted') : i18nT('hidden.active'));
         oc.tNotices._est.style.color = sil ? "#ffb74d" : "#a5d6a7";

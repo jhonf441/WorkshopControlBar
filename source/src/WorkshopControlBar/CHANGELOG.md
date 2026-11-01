@@ -1,5 +1,17 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.6 -- 2026-10-31
+
+- Lot 2: one relay client, camera client folder, single gallery, one presence helper, shared resources released at the last plugin, flash for the operator
+
+## 2.7.5 -- 2026-10-31
+
+- Hides what names a plugin that is absent; a plugin is active only by the machine list
+
+## 2.7.4 -- 2026-10-31
+
+- Merged work: config write path, exchange standard, review fixes
+
 ## 2.7.3 -- 2026-10-30
 
 - Manifest: sbcRequired true (needs WorkshopService); side bar keeps the group names

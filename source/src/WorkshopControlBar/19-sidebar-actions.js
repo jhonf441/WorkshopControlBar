@@ -1,5 +1,5 @@
       // ---- Actions and readings of the control bar (F3-J, 2026-10-21; moved out of 10-sidebar.js, same code) ----
-      // notifications (mute), navigation, the state of the relay, the shutdown actions and their messages.
+      // notifications (mute), navigation, the shutdown actions and their messages.
 
       // Shut down now / Restart everything: the service decides first (motion.ask, class power: it asks the person to confirm, or refuses
       // while somebody else has the control), then the macro runs with C1 and does not ask again (without C1 it asks, M291 S3).
@@ -64,6 +64,7 @@
 
       function sbRefreshNotice() {
         if (!sb.noticeStatus) return;
+        sbRefreshNoticeLinks(); // 18-sidebar-cards.js: the Activity button and help follow the plugin on every refresh
         var n = sbNotice;
         var fault = !!(n && n.last && n.last.ok === false);
         var txt, color;
@@ -71,10 +72,10 @@
           txt = i18nT('sidebar.no_data_from_the_backend');
           color = "rgba(255,255,255,0.6)";
         } else if (!n.config.active) {
-          txt = workshopPathExists("/Plugins/Activity") ? i18nT('sidebar.notifications_disabled') : i18nT('sidebar.notifications_disabled_short');
+          txt = workshopPluginActive("activity") ? i18nT('sidebar.notifications_disabled') : i18nT('sidebar.notifications_disabled_short');
           color = "rgba(255,255,255,0.6)";
         } else if (!n.config.topic) {
-          txt = workshopPathExists("/Plugins/Activity") ? i18nT('sidebar.no_destination_configured') : i18nT('sidebar.no_destination_configured_short');
+          txt = workshopPluginActive("activity") ? i18nT('sidebar.no_destination_configured') : i18nT('sidebar.no_destination_configured_short');
           color = "#ffb300";
         } else if (sbNoticeMuted()) {
           var until = new Date(n.config.silence_until * 1000);
@@ -156,75 +157,6 @@
         sbLiveStopFromStatus(status);
         sidebarRefresh();
         btnUpdateFromStatus(status);
-      }
-
-      // Relay state without asking for video: a HEAD (the relay does not implement
-      // do_HEAD, it answers 501 at once and closes -- it asks nothing of the
-      // ESP32). WARNING: do NOT use GET to a non-existent route -- its 404 comes out without
-      // Content-Length in HTTP/1.1 and the browser keeps waiting for the
-      // body until the timeout (measured 2026-10-08: it gave "stopped" with the
-      // relay running). no-cors: the response is opaque, but the fact that it RESOLVES
-      // already proves that the process is listening; connection refused = stopped.
-      function sidebarProbeRelay() {
-        if (pluginStopped || document.hidden) return; // hidden tab: nobody looks at the state
-        if (!sbRoleProbeRelay(sbRoleNow())) return; // a role that does not see the relay never asks for it (09-role.js)
-        getWebcamUrl().then(function (url) {
-          if (!url) {
-            sbRelayState = "nocam";
-            sidebarRefresh();
-            return;
-          }
-          var host;
-          try {
-            host = new URL(url, window.location.href).host;
-          } catch (e) {
-            sbRelayState = "unknown";
-            sidebarRefresh();
-            return;
-          }
-          var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-          var t = setTimeout(function () {
-            if (ctrl) ctrl.abort();
-          }, 3000);
-          fetch("http://" + host + "/emergencyfab-ping?_=" + Date.now(), {
-            method: "HEAD",
-            mode: "no-cors",
-            cache: "no-store",
-            signal: ctrl ? ctrl.signal : undefined,
-          })
-            .then(function () {
-              sbRelayState = "running";
-              // timelapse state (JSON with CORS; it carries the key by itself: 26-camera-key.js)
-              sbTlHost = window.location.hostname + ":8090"; // the system relay (the webcam may point directly at the camera)
-              return fetch("http://" + sbTlHost + "/state", { cache: "no-store" })
-                .then(function (r) { return r.ok ? r.json() : null; })
-                .then(function (d) { sbTl = d && d.timelapse ? d.timelapse : null; })
-                .catch(function () { sbTl = null; });
-            })
-            .catch(function () {
-              sbRelayState = "stopped";
-            })
-            .then(function () {
-              clearTimeout(t);
-              sidebarRefresh();
-            });
-        });
-      }
-
-      function sidebarRelayAction(action) {
-        sbRelayMsg = action === "stop" ? i18nT('sidebar.stopping_relay') : i18nT('sidebar.starting_relay');
-        sidebarRefresh();
-        workshopApiText(action === "stop" ? "camera.stop" : "camera.start")
-          .then(function (txt) {
-            sbRelayMsg = (txt || "").trim() || (action === "stop" ? i18nT('sidebar.relay_stopped') : i18nT('sidebar.relay_started'));
-          })
-          .catch(function (e) {
-            sbRelayMsg = "Error: " + e;
-          })
-          .then(function () {
-            sidebarRefresh();
-            setTimeout(sidebarProbeRelay, 1500);
-          });
       }
 
       // EXPLICIT arm/disarm (not "toggle"): the button says what it is going to

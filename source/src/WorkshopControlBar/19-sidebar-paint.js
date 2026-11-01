@@ -17,48 +17,6 @@
         return { armed: armed, jobRunning: jobRunning, met: met, thatDoes: thatDoes };
       }
 
-      // Camera relay and timelapse (GLOBAL).
-      function sbPaintRelay() {
-        // Relay (global)
-        var relayState = {
-          running: i18nT('sidebar.relay_state_running'),
-          stopped: i18nT('sidebar.relay_state_stopped'),
-          unknown: i18nT('sidebar.relay_state_unknown'),
-          nocam: i18nT('sidebar.relay_state_no_camera'),
-        }[sbRelayState];
-        var relayTxt = i18nT('sidebar.relay_status', { state: relayState });
-        sbT(sb.relayStatus, relayTxt);
-        sb.relayStatus.style.color =
-          sbRelayState === "running" ? "#a5d6a7" : sbRelayState === "stopped" ? "#ef9a9a" : "rgba(255,255,255,0.6)";
-        if (!sbRelayArmTimer) {
-          sbT(sb.relayStopBtn, i18nT('sidebar.stop_relay'));
-          sb.relayStopBtn.style.background = "#e65100";
-        }
-        sbT(sb.relayMsg, sbRelayMsg);
-        var tl = sbRelayState === "running" ? sbTl : null;
-        sbT(sb.tlStatus, !tl
-          ? i18nT('sidebar.timelapse_no_data_from_the_relay')
-          : tl.recording
-          ? i18nT('sidebar.timelapse_recording_job', { job: tl.job || "", n: tl.frames || 0 })
-          : tl.assembling
-          ? i18nT('sidebar.timelapse_building_the_video')
-          : i18nT('sidebar.timelapse_stopped'));
-        sb.tlStatus.style.color = tl && tl.recording ? "#ef9a9a" : "rgba(255,255,255,0.6)";
-        sbT(sb.tlBtn, tl && tl.recording ? i18nT('sidebar.stop_timelapse') : i18nT('sidebar.start_timelapse'));
-        sb.tlBtn.style.background = tl && tl.recording ? "#c62828" : "#1976d2";
-        sb.tlBtn.disabled = !tl;
-        sb.tlBtn.style.opacity = tl ? "1" : "0.5";
-        sbT(sb.tlMsg, sbTlMsg);
-        sb.railRelay.innerHTML =
-          sbIconSvg("relay", 22, sbRelayState === "stopped") +
-          '<span style="position:absolute;right:2px;top:2px;width:8px;height:8px;border-radius:50%;background:' +
-          (sbRelayState === "running" ? "#66bb6a" : sbRelayState === "stopped" ? "#ef5350" : "#9e9e9e") +
-          ';pointer-events:none"></span>';
-        sb.railRelay.title = i18nT('sidebar.camera_relay_global_state', { state: relayState });
-        sbH(sb.railPower, sbIconSvg("power", 22, false));
-        sbH(sb.railButtons, sbIconSvg("grid", 22, false));
-      }
-
       // Shut down when finished: status and button.
       function sbPaintShutdownState(pv) {
         var armed = pv.armed, jobRunning = pv.jobRunning, met = pv.met, thatDoes = pv.thatDoes;

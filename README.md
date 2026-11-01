@@ -2,7 +2,7 @@
 
 
 
-A side bar ("Controls") available on every DWC page: machine state with the status light, live-job stop, which floating panels are open on THIS screen (Camera, Jog), your own macro and G-code buttons grouped by function (lighting, laser, machine mode, power supply and restart, CNC zero, power usage), global switches (camera relay, phone notices) and "Shut down now" (safe shutdown of everything). It also schedules the power off at the end of a job.
+A side bar ("Controls") available on every DWC page: machine state with the status light, live-job stop, which floating panels are open on THIS screen (Camera, Jog), your own macro and G-code buttons grouped by function (lighting, laser, machine mode, power supply and restart, CNC zero, power usage), a global switch (phone notices) and "Shut down now" (safe shutdown of everything). It also schedules the power off at the end of a job.
 
 Version documented: 2.7.x on DWC 3.6.3.
 
@@ -45,7 +45,7 @@ Picture 11: the bar closed as an arrow: the stripes are the colors of the status
 
 ![Icon rail](img/12-bar-icon-rail-closed.png)
 
-Picture 12: the bar closed as an icon rail (large red rectangle): the arrow to open it, the round state indicator (small rectangle), the live job stop, the screen buttons (camera, jog) under LOCAL and the global ones (groups, camera relay, power, timer, alerts) under GLOBAL. The page makes room for it.
+Picture 12: the bar closed as an icon rail (large red rectangle): the arrow to open it, the round state indicator (small rectangle), the live job stop, the screen buttons (camera, jog) under LOCAL and the global ones (groups, power, timer, alerts) under GLOBAL. The page makes room for it.
 
 ![Bar top](img/02-bar-status-and-panels.png)
 
@@ -73,7 +73,7 @@ Picture 9: the bar collapsed to the arrow tab at the right edge (middle right).
 - What: opens or closes the floating camera viewer of WorkshopCamera on THIS screen only. It does not stop any process nor affect other users.
 - Where: group "THIS SCREEN", button "Camera" with its state "Open" / "Closed" (picture 2).
 - How: 1. Press "Camera" to open the viewer. 2. Press it again to close it.
-- Watch out: needs WorkshopCamera installed; the group says "No panels installed." otherwise.
+- Watch out: needs WorkshopCamera installed; the group says "No panels installed." otherwise. The bar only opens and closes the viewer: to start or stop the camera relay (the process that serves the video) use the Cameras sheet of WorkshopCamera.
 
 #### Open or close the Jog panel
 - What: opens or closes the floating Jog panel of WorkshopJog on this screen only.
@@ -124,7 +124,7 @@ Picture 3: button groups: Lighting, Laser, Machine mode, Power supply and restar
 
 ![Bottom of the bar](img/04-bar-global-and-shutdown.png)
 
-Picture 4: bottom of the bar: "Restart everything", the "Edit buttons" button, the versions line, the group "GLOBAL - AFFECTS EVERYONE" (Relay, Alerts, Shutdown) and the red "Shut down now" button.
+Picture 4: bottom of the bar: "Restart everything", the "Edit buttons" button, the versions line, the group "GLOBAL - AFFECTS EVERYONE" (Alerts, Shutdown) and the red "Shut down now" button.
 
 #### Edit buttons (add, edit, delete, reorder)
 - What: edit mode to change the groups and buttons of "MY BUTTONS". A button is a macro or G-code lines.
@@ -145,12 +145,6 @@ Picture 4: bottom of the bar: "Restart everything", the "Edit buttons" button, t
 - Watch out: a button runs the macro exactly as written. Buttons that cannot be used now are grey with a dashed border and the reason below.
 
 ### Global (affects everyone)
-
-#### Camera relay
-- What: card "Relay" shows whether the camera relay process on the system runs; opening it offers "Stop relay" / "Start relay".
-- Where: group "GLOBAL - AFFECTS EVERYONE", card "Relay" (picture 4).
-- How: 1. Open the card (">"). 2. Press "Stop relay", then press again to confirm ("Tap again: cut it for EVERYONE").
-- Watch out: stopping it cuts the camera for EVERYONE watching. To stop watching on your screen only, close the camera panel.
 
 #### Phone alerts mute
 - What: card "Alerts" shows whether phone notifications are Enabled, Muted until a time, or disabled; opening it offers "Mute 1 h" / "Unmute now".
@@ -177,7 +171,7 @@ Picture 4: bottom of the bar: "Restart everything", the "Edit buttons" button, t
 Picture 5: gear open: "Configure the bar (this screen only)", the "Start-up" button and the list of sections to show.
 
 #### What shows and the start-up card
-- What: tick or untick each section (THIS SCREEN, BUTTONS and each group, GLOBAL - MACHINE with Camera relay, Alerts, Shutdown) to show it in the bar and the rail on this screen. "Start-up" opens the card that lists which macro files the buttons need (light, air, power supply).
+- What: tick or untick each section (THIS SCREEN, BUTTONS and each group, GLOBAL - MACHINE with Alerts, Shutdown) to show it in the bar and the rail on this screen. "Start-up" opens the card that lists which macro files the buttons need (light, air, power supply).
 - Where: gear at the top right of the bar > top of the options (picture 5).
 - How: 1. Press the gear. 2. Untick what you do not use. 3. Press "Close" at the bottom.
 - Watch out: hidden buttons are not deleted. Per screen.
@@ -245,7 +239,7 @@ Looking: any role. Buttons act with the role of the macro/operation: lights and 
 
 ## 6. API operations used
 
-`power.off`, `power.full_reset`, `power.after_job`, `power.method`, `power.timer`, `power.timer_cancel`, `camera.start`, `camera.stop`, `camera.url`, `light.set`, `lights.save`, `notifications.get`, `notifications.mute`, plus macro / G-code execution through the allowed channel.
+`power.off`, `power.full_reset`, `power.after_job`, `power.method`, `power.timer`, `power.timer_cancel`, `light.set`, `lights.save`, `notifications.get`, `notifications.mute`, plus macro / G-code execution through the allowed channel.
 
 ## 7. Troubleshooting
 

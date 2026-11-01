@@ -125,7 +125,7 @@
         sbLiveStopRail(rail); // amber icon on top, only while a live job runs
 
         rail.appendChild(sbRailCaption("LOCAL", SIDEBAR_LOCAL_COLOR));
-        // Launchers of the registered panels (camera, jog...) -- filled
+        // Launchers of the registered panels -- filled
         // by sbSyncPanels() according to which plugins are installed.
         sb.railLocal = document.createElement("div");
         sb.railLocal.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:6px;";
@@ -136,8 +136,6 @@
         rail.appendChild(sbRailCaption("GLOBAL", SIDEBAR_GLOBAL_COLOR));
         sb.railButtons = sbMakeRailBtn("grid", i18nT('sidebar.custom_buttons_rail'), "btnCard");
         rail.appendChild(sb.railButtons);
-        sb.railRelay = sbMakeRailBtn("relay", i18nT('sidebar.camera_relay_rail'), "relayCard");
-        rail.appendChild(sb.railRelay);
         sb.railPower = sbMakeRailBtn("power", i18nT('sidebar.shut_down_now_rail'), "powerCard");
         sb.railPower.style.background = "#b71c1c";
         rail.appendChild(sb.railPower);
@@ -149,65 +147,6 @@
         rail.appendChild(sb.railTimerLabel);
         sb.railNotice = sbMakeRailBtn("bell", i18nT('sidebar.phone_notifications_global'), "notificationCard");
         rail.appendChild(sb.railNotice);
-      }
-
-      // Camera relay and manual timelapse (GLOBAL).
-      function sbBuildRelayCard(gGlobal) {
-        var relayCard = sbMakeCard(gGlobal, "relay", i18nT('sidebar.camera_relay_card'));
-        sbMakeSortableCard(relayCard, "relay");
-        sb.relayCard = relayCard;
-        sb.relayStatus = sbStatusLine(relayCard);
-        var relayRow = sbRow(relayCard);
-        sb.relayStopBtn = sbMakeButton(i18nT('sidebar.stop_relay'), "#e65100", function () {
-          // Double tap to confirm (native confirm() behaves badly in
-          // this kiosk, the same pattern as the jog's "Zero Z here").
-          if (!sbRelayArmTimer) {
-            sbT(sb.relayStopBtn, i18nT('sidebar.tap_again_cut_for_everyone'));
-            sb.relayStopBtn.style.background = "#b71c1c";
-            sbRelayArmTimer = setTimeout(function () {
-              sbRelayArmTimer = null;
-              sidebarRefresh();
-            }, 4000);
-            return;
-          }
-          clearTimeout(sbRelayArmTimer);
-          sbRelayArmTimer = null;
-          sidebarRelayAction("stop");
-        });
-        relayRow.appendChild(sb.relayStopBtn);
-        sb.relayStartBtn = sbMakeButton(i18nT('sidebar.start_relay'), "#1976d2", function () {
-          sidebarRelayAction("start");
-        });
-        relayRow.appendChild(sb.relayStartBtn);
-        sb.relayMsg = sbMsgLine("font-size:11px;color:#ffe082;");
-        relayCard.appendChild(sb.relayMsg);
-        // manual timelapse (GLOBAL: records on the Pi, anyone sees it and stops it)
-        var tlSep = document.createElement("div");
-        tlSep.style.cssText = "height:1px;background:rgba(255,255,255,0.1);margin:6px 0 2px 0;";
-        relayCard.appendChild(tlSep);
-        sb.tlStatus = sbStatusLine(relayCard);
-        var tlRow = sbRow(relayCard);
-        sb.tlBtn = sbMakeButton(i18nT('sidebar.start_timelapse'), "#1976d2", function () {
-          if (!sbTlHost) return;
-          var parar = !!(sbTl && sbTl.recording);
-          sbTlMsg = parar ? i18nT('sidebar.stopping_the_timelapse') : i18nT('sidebar.starting_the_timelapse');
-          sidebarRefresh();
-          fetch("http://" + sbTlHost + "/timelapse?action=" + (parar ? "stop" : "begin"), { method: "POST" })
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
-              sbTlMsg = d.ok ? (parar ? i18nT('sidebar.stopped_the_video_is_built_on') : "") : i18nT('sidebar.couldn_t_error', { error: d.error || "" });
-            })
-            .catch(function (e) { sbTlMsg = i18nT('sidebar.couldn_t_error', { error: String(e.message || e) }); })
-            .then(sidebarProbeRelay);
-        });
-        tlRow.appendChild(sb.tlBtn);
-        sb.tlMsg = sbMsgLine("font-size:11px;color:#ffe082;");
-        relayCard.appendChild(sb.tlMsg);
-        relayCard.appendChild(
-          sbText(
-            i18nT('sidebar.stop_relay_help')
-          )
-        );
       }
 
       // Phone notifications (GLOBAL).
@@ -222,21 +161,29 @@
           sbNoticeAction(sbNoticeMuted() ? 0 : 60);
         });
         notifRow.appendChild(sb.noticeBtn);
-        // the notification settings live in the Activity plugin: no button when it is not installed or not enabled
-        if (workshopPathExists("/Plugins/Activity")) {
-          sb.noticeSettingsBtn = sbMakeButton(i18nT('sidebar.settings_ellipsis'), "#455a64", function () {
-            sbGoTo("/Plugins/Activity");
-          });
-          notifRow.appendChild(sb.noticeSettingsBtn);
-        }
+        // the notification settings live in the Activity plugin: the button is always built and shown or hidden on every
+        // refresh (sbRefreshNoticeLinks), because Activity can load after the bar, or be stopped, later
+        sb.noticeSettingsBtn = sbMakeButton(i18nT('sidebar.settings_ellipsis'), "#455a64", function () {
+          sbGoTo("/Plugins/Activity");
+        });
+        sb.noticeSettingsBtn.style.display = "none";
+        notifRow.appendChild(sb.noticeSettingsBtn);
         sb.noticeMsg = sbMsgLine("font-size:11px;color:#ffe082;");
         notifCard.appendChild(sb.noticeMsg);
-        // the help names the Activity page only when that plugin is there
-        notifCard.appendChild(
-          sbText(
-            workshopPathExists("/Plugins/Activity") ? i18nT('sidebar.mute_help') : i18nT('sidebar.mute_help_no_activity')
-          )
-        );
+        sb.noticeHelp = sbText("");
+        notifCard.appendChild(sb.noticeHelp);
+        sbRefreshNoticeLinks();
+      }
+
+      // What of the notification card names Activity: the "Settings..." button and the sentence of the help. Both are hidden / worded
+      // without the name while that plugin is not installed or not enabled. Idempotent: it runs on every refresh of the bar.
+      function sbRefreshNoticeLinks() {
+        var hasActivity = workshopPluginActive("activity");
+        if (sb.noticeSettingsBtn) {
+          var shown = hasActivity ? "" : "none";
+          if (sb.noticeSettingsBtn.style.display !== shown) sb.noticeSettingsBtn.style.display = shown;
+        }
+        if (sb.noticeHelp) sbT(sb.noticeHelp, hasActivity ? i18nT('sidebar.mute_help') : i18nT('sidebar.mute_help_no_activity'));
       }
 
       // How it shuts down: meter, relay or PS_ON (used by the three shutdown actions).

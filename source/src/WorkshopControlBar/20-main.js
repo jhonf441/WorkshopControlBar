@@ -18,7 +18,7 @@
       }, BAR_STATUS_POLL_MS);
 
       workshopOnChange(sidebarRefresh);
-      var barIdentityOff = workshopOnIdentity(function () { if (!pluginStopped) { sidebarRefresh(); sidebarProbeRelay(); } }); // a new role shows / hides parts (09-role.js)
+      var barIdentityOff = workshopOnIdentity(function () { if (!pluginStopped) sidebarRefresh(); }); // a new role shows / hides parts (09-role.js)
       workshopOnStatus(sidebarUpdateFromStatus);
       workshopWhenReady(function () {
         createSidebar();
@@ -92,12 +92,15 @@
       }
       var orphanOverlayTimer = setInterval(checkOrphanOverlays, 1500);
 
+      // the <style> elements only this plugin uses leave the page when it stops (the shared ones go with the last plugin: workshopRemoveLeftovers)
+      var BAR_OWN_STYLES = ["workshop-sb-role-css", "workshop-bar-hidden-css", "workshop-sb-hidden-css", "workshop-bar-oc-filter-css", "workshop-bar-oc-css"];
+      workshopOwnStyles(BAR_OWN_STYLES);
+
       workshopOnStop(function () {
         barStatusOff();
         barIdentityOff();
         clearInterval(orphanOverlayTimer);
         clearInterval(sbControlTimer);
-        if (sbRelayProbeTimer) clearInterval(sbRelayProbeTimer);
         workshopOffChange(sidebarRefresh);
         workshopOffStatus(sidebarUpdateFromStatus);
         var node = document.getElementById(SIDEBAR_ID);

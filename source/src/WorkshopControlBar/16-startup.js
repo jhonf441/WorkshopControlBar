@@ -12,7 +12,8 @@
       // file and writes it only when the person confirms. Nothing assumes the owner's pins or macro names: every
       // number has a default that the person changes. docs-internal/STARTUP-WIZARD.md explains the format.
 
-      // Question that asks HOW the machine does it. opciones: the [value, key] pairs offered.
+      // Question that asks HOW the machine does it. options: the [value, key] pairs offered. The key may be a function that returns it: the
+      // label is then looked up every time the question is drawn (an option that names another plugin changes with that plugin).
       function barQuestionMethod(options) {
         return {
           id: "method",
@@ -21,9 +22,17 @@
           help: "startup_bar.q_method_tip",
           defaultValue: options[0][0],
           options: options.map(function (o) {
-            return { value: o[0], label: o[1] };
+            var opt = { value: o[0] };
+            if (typeof o[1] === "function") Object.defineProperty(opt, "label", { enumerable: true, get: o[1] });
+            else opt.label = o[1];
+            return opt;
           }),
         };
+      }
+
+      // The service paints the strip with or without the Lights plugin (Lights only edits how); the option names its page only while it is there.
+      function barServiceOptionKey() {
+        return workshopPluginActive("lights") ? "startup_bar.opt_service" : "startup_bar.opt_service_no_lights";
       }
 
       // Question for the number of an output of the board (M42 P<n>)
@@ -63,7 +72,7 @@
       // follow it), a LED strip painted by this file (M150), a lamp on an output of the board (M42) or the person's own macro
       function barWizardLight(turn_on) {
         var preguntas = [
-          barQuestionMethod([["service", "startup_bar.opt_service"], ["strip", "startup_bar.opt_strip"], ["output", "startup_bar.opt_output"], ["macro", "startup_bar.opt_macro"]]),
+          barQuestionMethod([["service", barServiceOptionKey], ["strip", "startup_bar.opt_strip"], ["output", "startup_bar.opt_output"], ["macro", "startup_bar.opt_macro"]]),
           { id: "leds", kind: "number", integer: true, min: 1, max: 1000, defaultValue: 20, label: "startup_bar.q_leds", help: "startup_bar.q_leds_tip", si: { question: "method", value: "strip" } },
         ];
         if (turn_on) {
@@ -77,7 +86,7 @@
             var l = barHeader(turn_on ? 'Macro for the "Light on" button of the control bar.' : 'Macro for the "Light off" button of the control bar.');
             if (r.method === "service") {
               l.push("; The system service switches the work light, keeps its state (the button of the bar shows it) and paints the strip");
-              l.push("; (Lights page; the strip has to be set up first: M950 E.. in your config.g). It runs 0:/macros/light/lighton.g and lightoff.g,");
+              l.push("; (" + (workshopPluginActive("lights") ? "Lights page; " : "") + "the strip has to be set up first: M950 E.. in your config.g). It runs 0:/macros/light/lighton.g and lightoff.g,");
               l.push("; which only set the colour of the work light (global.lightZoneColor).");
               l.push('M98 P"0:/sys/workshop/macros/service-call.g" S"light.set" A"on=' + (turn_on ? "true" : "false") + '" Q1');
             } else if (r.method === "strip") {

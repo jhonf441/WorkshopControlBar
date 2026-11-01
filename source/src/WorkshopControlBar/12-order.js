@@ -3,8 +3,8 @@
       // Request 2026-10-08: "being able to drag the other groups (not only those
       // of Buttons) to arrange them to taste". "Order" button in the
       // bar's header: it shows a handle (little stripes) on each SECTION
-      // (THIS SCREEN / BUTTONS / GLOBAL) and on each fixed CARD (Camera,
-      // Jog, Relay, Notifications, Shutdown) and on the Buttons groups.
+      // (THIS SCREEN / BUTTONS / GLOBAL) and on each fixed CARD (the panels,
+      // Notifications, Shutdown) and on the Buttons groups.
       // Cards move WITHIN their section (a GLOBAL card does not
       // go to THIS SCREEN: the section's color says whom it affects).
       // The order of sections and fixed cards belongs to THIS screen
@@ -295,7 +295,6 @@
 
       // card/section -> its icons in the rail (collapsed bar)
       function sbRailOf(key) {
-        if (key === "relay") return [sb.railRelay];
         if (key === "notice") return [sb.railNotice];
         if (key === "power") return [sb.railPower, sb.railTimer, sb.railTimerLabel];
         if (key === "buttons") return [sb.railButtons];
