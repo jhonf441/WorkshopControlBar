@@ -73,13 +73,19 @@ Picture 9: the bar collapsed to the arrow tab at the right edge (middle right).
 - What: opens or closes the floating camera viewer of WorkshopCamera on THIS screen only. It does not stop any process nor affect other users.
 - Where: group "THIS SCREEN", button "Camera" with its state "Open" / "Closed" (picture 2).
 - How: 1. Press "Camera" to open the viewer. 2. Press it again to close it.
-- Watch out: needs WorkshopCamera installed; the group says "No panels installed." otherwise. The bar only opens and closes the viewer: to start or stop the camera relay (the process that serves the video) use the Cameras sheet of WorkshopCamera.
+- Watch out: needs WorkshopCamera installed; the group says "No panels installed." otherwise. The bar only opens and closes the viewer: to start or stop the camera relay (the process that serves the video) use the Cameras tab of the page of WorkshopCamera, or turn on the optional relay card of the bar (gear > the switch of that card, off by default).
 
 #### Open or close the Jog panel
 - What: opens or closes the floating Jog panel of WorkshopJog on this screen only.
 - Where: group "THIS SCREEN", button "Jog" (picture 2).
 - How: same as the camera button.
 - Watch out: opening the panel moves nothing; moving is done inside the Jog panel.
+
+#### How you see that a panel is open
+- What: a panel that is open on this screen shows at first sight in the three places where the bar lists it. Its tile (the switch of the compact view) is filled with the accent blue, says "Open" with a small dot that pulses softly, and shows the action "Close" at its right. Its icon in the closed rail is filled blue with a white-blue ring and the same pulsing dot in the corner. Its card in the arrange list is filled blue, its status line says "Open on this screen" with the dot, and its button says "Close <panel>". A closed panel keeps the quiet gray look and says "Closed". A panel that is still closing (it stops what it is doing first) keeps the open look with its own words.
+- Where: group "THIS SCREEN" (tile and card) and "LOCAL" in the closed rail (icon).
+- How: nothing to press; it follows the panel. It works for any panel a plugin registers in the shared registry, including panels of plugins added later: the bar names none.
+- Watch out: it does not depend on colour alone: the words ("Open", "Close"), the dot, the ring and the pressed state that screen readers announce change too. With the system setting "reduce motion" the dot stays on and does not pulse. Touch targets are 44 px tall. The pictures of this README were taken before this look.
 
 ### My buttons (macros and G-code)
 
@@ -175,6 +181,12 @@ Picture 5: gear open: "Configure the bar (this screen only)", the "Start-up" but
 - Where: gear at the top right of the bar > top of the options (picture 5).
 - How: 1. Press the gear. 2. Untick what you do not use. 3. Press "Close" at the bottom.
 - Watch out: hidden buttons are not deleted. Per screen.
+
+#### Optional cards that other plugins offer
+- What: a plugin can offer the bar an extra card for what it owns. The first one is the camera relay (state, Stop relay, Start relay), offered by WorkshopCamera. These cards are in the GLOBAL group and every one is a switch in the gear list; they are **off** until you turn them on. A plugin that is stopped or not installed leaves no card, and the card only appears for the roles that may use it (the relay: technician).
+- Where: gear > the list of sections, under GLOBAL (the switch carries the name of the card). When on, the card is in GLOBAL, its icon in the rail and, in the home view, a tile in the Global block.
+- How: 1. Press the gear. 2. Tick the card. 3. Close the gear. 4. Untick it to hide it again; "Show all" returns every card to its starting state.
+- Watch out: per screen. The bar only reads the state of the card while the card is on screen (bar open and card on).
 
 ![Gear: options](img/06-gear-closed-style-and-options.png)
 

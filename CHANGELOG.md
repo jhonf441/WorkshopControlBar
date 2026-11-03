@@ -1,5 +1,37 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.13 -- 2026-11-03
+
+- Rail icons drawn when the button is created, bar shows only its own version, fold chevron as SVG, section select outside the label
+
+## Unreleased
+
+- Control bar: every icon of the rail is drawn when its button is built (Buttons and Shut down now were blank squares: the painters that drew them left with the relay card); the foot of the bar says the bar's own version only (it listed every workshop plugin loaded in the page, so it seemed to carry the Workbench's version); the fold chevron of the cards is an SVG that turns when the card folds (it was a unicode glyph the kiosk font lacks); the "its section" dropdown of the gear sits next to its label and nothing cancels its click
+
+## 2.7.12 -- 2026-11-01
+
+- WorkshopControlBar: nav scroll finds the new bar after a redraw
+
+## 2.7.11 -- 2026-11-01
+
+- WorkshopControlBar: nav scroll second try; camera preview late photo
+
+## 2.7.10 -- 2026-11-01
+
+- WorkshopControlBar: shared nav-scroll fix; job control stage 1 where applicable
+
+## 2.7.9 -- 2026-11-01
+
+- Control bar: the Notifications and Shutdown tiles of the Hidden style are hidden with their card in the gear (they opened an empty view); the GLOBAL block goes when no tile is left
+
+## 2.7.8 -- 2026-11-01
+
+- an open panel shows as open on the rail icon, card and Hidden-style tile: accent fill, ring, pulsing dot, Open / Close
+
+## 2.7.7 -- 2026-10-31
+
+- Control bar: plugins offer optional tiles to the Global section (workshopRegisterBarTile), one switch each in the gear
+
 ## 2.7.6 -- 2026-10-31
 
 - Lot 2: one relay client, camera client folder, single gallery, one presence helper, shared resources released at the last plugin, flash for the operator

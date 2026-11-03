@@ -3,7 +3,7 @@
       //
       // Home: machine state, THIS SCREEN as large switches
       // (the registered panels), MY BUTTONS with chips to filter by
-      // group, GLOBAL as status cards (Notices, Shutdown) and
+      // group, GLOBAL as status cards (Notices, Shutdown and the tiles other plugins offer) and
       // "Shut down now" separate at the bottom. Tapping a global card opens its
       // DETAIL in the same panel (the usual card, with an arrow to go
       // back): nothing of what they do is duplicated; only how it is seen
@@ -94,6 +94,8 @@
         oc.bottom.appendChild(ocLbl(i18nT('hidden.global_affects_everyone'), SIDEBAR_GLOBAL_COLOR));
         var gg = ocEl("div", "display:grid;grid-template-columns:1fr 1fr;gap:8px;");
         oc.bottom.appendChild(gg);
+        oc.grid = gg; // the tiles other plugins offer are added to it (11-hidden-tiles.js)
+        oc.tiles = {};
         oc.tNotices = ocTile(function () { ocIr("notificationCard"); });
         oc.tShutdown = ocTile(function () { ocIr("powerCard"); });
         oc.tNotices.style.gridColumn = oc.tShutdown.style.gridColumn = "span 2";
@@ -191,6 +193,24 @@
         }
       }
 
+      // The key of the card each fixed tile of the home opens (the keys of the gear: 12-order.js). A tile of a plugin has its own key as the view.
+      var OC_VIEW_KEYS = { notificationCard: "notice", powerCard: "power" };
+
+      // Is the card behind this view hidden in the gear of this screen? Then its tile has nothing to open.
+      function ocViewHidden(v) {
+        return typeof sbKeyHidden === "function" && sbKeyHidden(OC_VIEW_KEYS[v] || v);
+      }
+
+      // Marks the tiles of the home whose card is hidden in the gear, and the whole GLOBAL block when none is left (a title with no tile under it).
+      // The plugin tiles do their own mark (11-hidden-tiles.js); here are the fixed ones. The rule of data-sb-hidden is in 12-order.js.
+      function ocHiddenFlags() {
+        if (!oc || !oc.tNotices) return;
+        oc.tNotices.dataset.sbHidden = ocViewHidden("notificationCard") ? "1" : "";
+        oc.tShutdown.dataset.sbHidden = ocViewHidden("powerCard") ? "1" : "";
+        var all = [oc.tNotices, oc.tShutdown].concat(Object.keys(oc.tiles || {}).map(function (id) { return oc.tiles[id]; }));
+        oc.bottom.dataset.sbHidden = all.every(function (t) { return t.dataset.sbHidden === "1"; }) ? "1" : "";
+      }
+
       function ocIr(v) {
         ocView = v;
         ocApply();
@@ -213,7 +233,7 @@
         ocArm();
         ocRestore();
         var card = ocView !== "start" ? sb[ocView] : null;
-        if (ocView !== "start" && !(card && sb.full.contains(card))) ocView = "start";
+        if (ocView !== "start" && (ocViewHidden(ocView) || !(card && sb.full.contains(card)))) ocView = "start"; // a card hidden in the gear opens empty: back to the home
         sidebarEl.dataset.ocView = ocView === "start" ? "start" : "detail";
         oc.footer.style.display = ocView === "start" ? "block" : "none";
         if (ocView === "start") {
@@ -229,7 +249,7 @@
         // detail: only that card (and the chain up to sb.full), with the arrow
         oc.top.style.display = oc.bottom.style.display = "none";
         oc.back.style.display = "flex";
-        sbT(oc.backTit, { notificationCard: i18nT('sidebar.phone_notifications'), powerCard: i18nT('sidebar.shutdown') }[ocView] || "");
+        sbT(oc.backTit, { notificationCard: i18nT('sidebar.phone_notifications'), powerCard: i18nT('sidebar.shutdown') }[ocView] || ocTileTitleOf(ocView));
         var n = card;
         while (n && n !== sb.full) {
           var p = n.parentNode;
@@ -284,6 +304,7 @@
               });
               sbH(t._ic, sbIconSvg(p.icon, 18, false));
               sbT(t._tit, p.title);
+              ocOpenTileBuild(t); // 11-hidden-open.js: the second line is a badge row
             }
             oc.locGrid.appendChild(t);
             var s = {};
@@ -292,14 +313,7 @@
             } catch (err) {
               /* sin estado */
             }
-            var on = !!(s.open || s.busy);
-            // an open panel: a stronger neutral border and the title in 600 (no tint, no colored icon box: design family)
-            t.style.borderColor = on ? "rgba(128,128,128,0.8)" : "rgba(128,128,128,0.3)";
-            t._tit.style.fontWeight = on ? "600" : "500";
-            sbT(t._est, s.open ? i18nT('hidden.open') : i18nT('sidebar.closed'));
-            t._est.style.color = on ? "#eceff1" : "#b0bec5";
-            t.disabled = !!s.disabled;
-            t.style.opacity = s.disabled ? "0.5" : "1";
+            ocPaintPanelTile(t, p, s); // 11-hidden-open.js: an open panel is a tile filled with the accent, "Open" with a dot, "Close"
           });
 
         // global
@@ -311,4 +325,6 @@
         sbT(oc.tShutdown._est, txt);
         oc.tShutdown._est.style.color = sbTiming || arm ? "#ffb74d" : "#b0bec5";
         oc.tShutdown.style.borderColor = sbTiming || arm ? "rgba(255,152,0,0.5)" : "rgba(128,128,128,0.3)";
+        ocPaintTiles(); // 11-hidden-tiles.js
+        ocHiddenFlags();
       }

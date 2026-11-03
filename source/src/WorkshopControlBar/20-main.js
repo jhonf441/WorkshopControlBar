@@ -93,7 +93,7 @@
       var orphanOverlayTimer = setInterval(checkOrphanOverlays, 1500);
 
       // the <style> elements only this plugin uses leave the page when it stops (the shared ones go with the last plugin: workshopRemoveLeftovers)
-      var BAR_OWN_STYLES = ["workshop-sb-role-css", "workshop-bar-hidden-css", "workshop-sb-hidden-css", "workshop-bar-oc-filter-css", "workshop-bar-oc-css"];
+      var BAR_OWN_STYLES = ["workshop-sb-role-css", "workshop-bar-hidden-css", "workshop-sb-hidden-css", "workshop-bar-oc-filter-css", "workshop-bar-oc-css", SB_OPEN_STYLE_ID];
       workshopOwnStyles(BAR_OWN_STYLES);
 
       workshopOnStop(function () {

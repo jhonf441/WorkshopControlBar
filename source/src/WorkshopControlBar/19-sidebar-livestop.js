@@ -44,8 +44,7 @@
       function sbLiveStopRail(rail) {
         sb.railLiveStop = sbMakeRailBtn(SB_LIVESTOP_ICON, i18nT('sidebar.live_stop_rail'), "", function () {
           sidebarSetCollapsed(false);
-        });
-        sb.railLiveStop.innerHTML = sbIconSvg(SB_LIVESTOP_ICON, 22, false);
+        }); // the icon is drawn by sbMakeRailBtn
         sb.railLiveStop.style.display = "none";
         sb.railLiveStop.style.background = "#b26a00";
         sb.railLiveStop.style.borderColor = "#ffb74d";

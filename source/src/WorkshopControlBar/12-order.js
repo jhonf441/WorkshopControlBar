@@ -215,6 +215,61 @@
         if (typeof ocApply === "function") ocApply(); // Hidden: sorting shows the whole list
       }
 
+      // One row of the gear's list: a checkbox that shows or hides a section, a card or a button group (`items` is the list it goes in). For a
+      // card, when this screen has own sections, a dropdown at its right says which section the card is seen in. The dropdown is a plain
+      // <select> NEXT TO the label, never inside it: a control inside a <label> needs its click cancelled so the label does not toggle the
+      // checkbox, and a cancelled click is a dropdown that never opens in some browsers (the "arrow that does nothing").
+      function sbConfigRow(items, text, marcado, sangria, alChange, cardKey) {
+        var l = document.createElement("label");
+        l.style.cssText = "display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0 3px " + (sangria ? 18 : 0) + "px;cursor:pointer;flex:1 1 auto;min-width:0;";
+        var c = document.createElement("input");
+        c.type = "checkbox";
+        c.checked = marcado;
+        c.style.cssText = "width:16px;height:16px;flex:none;";
+        c.addEventListener("change", function () {
+          alChange(c.checked);
+        });
+        l.appendChild(c);
+        l.appendChild(document.createTextNode(text));
+        if (!cardKey || !sbConfig.sections.length) {
+          items.appendChild(l);
+          return;
+        }
+        var r = document.createElement("div");
+        r.style.cssText = "display:flex;align-items:center;gap:8px;";
+        r.appendChild(l);
+        r.appendChild(sbConfigSectionSelect(cardKey));
+        items.appendChild(r);
+      }
+
+      // The dropdown of a card row of the gear: the section the card came with ("its section") or one of the own sections of this screen.
+      // Only its change does something; no handler cancels a click or a pointer on it.
+      function sbConfigSectionSelect(cardKey) {
+        var sel = document.createElement("select");
+        sel.style.cssText = "flex:none;max-width:110px;min-height:32px;padding:4px 6px;font-size:11px;background:#1e272c;color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:4px;";
+        sel.title = i18nT('order.card_section_tip');
+        sel.setAttribute("aria-label", sel.title);
+        var op0 = document.createElement("option");
+        op0.value = "";
+        sbT(op0, i18nT('order.its_section'));
+        sel.appendChild(op0);
+        sbConfig.sections.forEach(function (sec) {
+          var o = document.createElement("option");
+          o.value = sec.id;
+          sbT(o, sec.name);
+          sel.appendChild(o);
+        });
+        sel.value = sbConfig.location[cardKey] || "";
+        sel.addEventListener("change", function () {
+          if (sel.value) sbConfig.location[cardKey] = sel.value;
+          else delete sbConfig.location[cardKey];
+          sbConfigSave();
+          sbConfigApply();
+          sbConfigRender();
+        });
+        return sel;
+      }
+
       // Row of a "show X" option kept negated in sbConfig (sbConfig[key] = true means hidden); after() runs once it is saved
       function sbConfigShowRow(row, label, key, after) {
         row(label, !sbConfig[key], false, function (v) {
@@ -229,11 +284,12 @@
       // rail), whether the status lights are seen on top, and "Order". All in
       // localStorage: each screen builds its own bar.
       var SB_CONFIG_KEY = "workshopBarConfig";
-      var SB_CONFIG_EMPTY = { ocultas: [], withoutLeds: false, withoutArrow: false, withoutLiveStop: false, compact: false, collapsible: false, collapsed: [], sections: [], location: {}, closed: "rail", autoClose: false, pushPage: true };
+      var SB_CONFIG_EMPTY = { ocultas: [], tiles: {}, withoutLeds: false, withoutArrow: false, withoutLiveStop: false, compact: false, collapsible: false, collapsed: [], sections: [], location: {}, closed: "rail", autoClose: false, pushPage: true };
       var sbConfig = JSON.parse(JSON.stringify(SB_CONFIG_EMPTY));
       try {
         var _c = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || "{}") || {};
         sbConfig.ocultas = Array.isArray(_c.ocultas) ? _c.ocultas : [];
+        sbConfig.tiles = sbTilesRead(_c.tiles); // the switches of the tiles other plugins offer: {id: bool} (09-tiles.js)
         sbConfig.withoutLeds = !!_c.withoutLeds;
         sbConfig.withoutArrow = !!_c.withoutArrow;
         sbConfig.withoutLiveStop = !!_c.withoutLiveStop;
@@ -298,7 +354,8 @@
         if (key === "notice") return [sb.railNotice];
         if (key === "power") return [sb.railPower, sb.railTimer, sb.railTimerLabel];
         if (key === "buttons") return [sb.railButtons];
-        return [];
+        var tileId = sbTileIdOf(key); // a tile other plugins offer (18-sidebar-tiles.js)
+        return tileId !== null && sbTileUi[tileId] ? [sbTileUi[tileId].rail] : [];
       }
 
       // marks with data-sb-hidden what is hidden (a CSS rule with
@@ -431,7 +488,7 @@
         Object.keys(sbOrderBoxes).forEach(function (scope) {
           sbKeyed(sbOrderBoxes[scope]).forEach(function (el) {
             el.dataset.sbCollapsed = sbConfig.collapsed.indexOf(el.dataset.sbKey) >= 0 ? "1" : "";
-            var oculta = sbConfig.ocultas.indexOf(el.dataset.sbKey) >= 0;
+            var oculta = sbKeyHidden(el.dataset.sbKey); // 18-sidebar-tiles.js: a tile follows its own switch and default
             el.dataset.sbHidden = oculta ? "1" : "";
             sbRailOf(el.dataset.sbKey).forEach(function (r) {
               if (r) r.dataset.sbHidden = oculta ? "1" : "";
@@ -441,6 +498,7 @@
         // button groups: their section and whether they are seen (drawn by btnRender).
         // This runs on every state refresh: redraw only if something changed
         // (recreating the buttons every 2 s loses taps and focus).
+        if (typeof ocHiddenFlags === "function") ocHiddenFlags(); // 11-hidden.js: the tiles of the home follow the same switches
         var keyGroups = JSON.stringify([Object.keys(sbSecOwn), sbConfig.location, sbConfig.ocultas]);
         if (keyGroups !== sbKeyGroups && typeof btnRender === "function") {
           sbKeyGroups = keyGroups;
@@ -476,74 +534,27 @@
         items.style.cssText = "display:flex;flex-direction:column;gap:2px;margin:4px 0;";
         box.appendChild(items);
         function row(text, marcado, sangria, alChange, cardKey) {
-          var l = document.createElement("label");
-          l.style.cssText = "display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0 3px " + (sangria ? 18 : 0) + "px;cursor:pointer;";
-          var c = document.createElement("input");
-          c.type = "checkbox";
-          c.checked = marcado;
-          c.style.cssText = "width:16px;height:16px;flex:none;";
-          c.addEventListener("change", function () {
-            alChange(c.checked);
-          });
-          l.appendChild(c);
-          l.appendChild(document.createTextNode(text));
-          // with own sections: which section this card goes to
-          if (cardKey && sbConfig.sections.length) {
-            var sel = document.createElement("select");
-            sel.style.cssText = "margin-left:auto;max-width:110px;font-size:11px;background:#1e272c;color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:4px;";
-            var op0 = document.createElement("option");
-            op0.value = "";
-            sbT(op0, i18nT('order.its_section'));
-            sel.appendChild(op0);
-            sbConfig.sections.forEach(function (sec) {
-              var o = document.createElement("option");
-              o.value = sec.id;
-              sbT(o, sec.name);
-              sel.appendChild(o);
-            });
-            sel.value = sbConfig.location[cardKey] || "";
-            sel.addEventListener("click", function (ev) {
-              ev.preventDefault();
-              ev.stopPropagation();
-            });
-            sel.addEventListener("change", function () {
-              if (sel.value) sbConfig.location[cardKey] = sel.value;
-              else delete sbConfig.location[cardKey];
-              sbConfigSave();
-              sbConfigApply();
-              sbConfigRender();
-            });
-            l.appendChild(sel);
-          }
-          items.appendChild(l);
-        }
-        function alternar(key, ver) {
-          sbConfig.ocultas = sbConfig.ocultas.filter(function (k) {
-            return k !== key;
-          });
-          if (!ver) sbConfig.ocultas.push(key);
-          sbConfigSave();
-          sbConfigApply();
+          sbConfigRow(items, text, marcado, sangria, alChange, cardKey); // the checkbox row, with the section dropdown of a card
         }
         var secciones = sbOrderBoxes.sections ? sbKeyed(sbOrderBoxes.sections) : [];
         secciones.forEach(function (sec) {
           var k = sec.dataset.sbKey;
-          row(sbConfigName(sec), sbConfig.ocultas.indexOf(k) < 0, false, function (v) {
-            alternar(k, v);
+          row(sbConfigName(sec), !sbKeyHidden(k), false, function (v) {
+            sbKeyShow(k, v);
           });
           var tarjetas = sbOrderBoxes[k] ? sbKeyed(sbOrderBoxes[k]) : [];
           tarjetas.forEach(function (card) {
             var kc = card.dataset.sbKey;
-            row(sbConfigName(card), sbConfig.ocultas.indexOf(kc) < 0, true, function (v) {
-              alternar(kc, v);
+            row(sbConfigName(card), !sbKeyHidden(kc), true, function (v) {
+              sbKeyShow(kc, v);
             }, card.dataset.sbCard ? kc : null);
           });
           // button groups (from the Pi): hide them or take them to an own section
           if (k === "buttons" && typeof btnData !== "undefined" && btnData) {
             btnData.groups.forEach(function (gr) {
               var kg = "grp:" + gr.id;
-              row(gr.title, sbConfig.ocultas.indexOf(kg) < 0, true, function (v) {
-                alternar(kg, v);
+              row(gr.title, !sbKeyHidden(kg), true, function (v) {
+                sbKeyShow(kg, v);
               }, kg);
             });
           }

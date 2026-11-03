@@ -11,7 +11,8 @@
       //     any process nor affect other screens.
       //   GLOBAL (orange): Phone notifications and Shutdown (now / when
       //     finished). They affect the machine and ALL the screens.
-      //   Nothing of another plugin lives here: the bar only draws what is in the registry (window.__workshop.panels).
+      //   Nothing of another plugin lives here: the bar only draws what is in the registry (window.__workshop.panels) and what the plugins
+      //     offer as tiles (window.__workshop.barTiles: optional GLOBAL cards, each one a switch of the gear; 09-tiles.js).
       //   Closing the jog != stopping anything global (it only releases what is
       //   held); Shut down when finished != Shut down now.
       //
@@ -77,6 +78,7 @@
           '<path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h8v8h-8v-8zm2 2v4h4v-4h-4z"/>',
         bell:
           '<path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>',
+        fold: '<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>', // chevron down: the fold mark of a card (turns when it is folded)
       };
 
       // Phone notifications (WorkshopService backend, notifier.py): published
@@ -246,12 +248,13 @@
         sbT(ttl, title);
         ttl.style.cssText = "flex:0 1 auto;min-width:0;";
         head.appendChild(sbMarquee(ttl));
-        // tarjetas plegables (engranaje): tocar el titulo pliega/abre
+        // foldable cards (gear): tapping the title folds / opens. The chevron is an SVG like every other icon of the bar (no unicode glyph:
+        // the kiosk font has none) and a flex box, so the rotate of 12-order.js applies to it when the card is folded.
         c.dataset.sbCard = "1";
         var chev = document.createElement("span");
         chev.dataset.sbChev = "1";
-        chev.style.cssText = "margin-left:auto;font-size:14px;opacity:0.7;";
-        sbT(chev, "▾");
+        chev.style.cssText = "margin-left:auto;flex:none;display:inline-flex;opacity:0.7;transition:transform 0.15s;";
+        sbH(chev, sbIconSvg("fold", 18, false));
         head.appendChild(chev);
         head.addEventListener("click", function () {
           if (typeof sbFold === "function") sbFold(c);
@@ -285,10 +288,14 @@
       // `onTap` (only for the LOCAL launchers of the registered panels): instead
       // of opening the bar, it executes directly -- opening/closing a panel of
       // this screen is harmless. The GLOBAL ones never pass it.
+      // The icon is drawn HERE, when the button is made: a painter that repaints it on refresh (the timer, the bell) only rewrites it when it
+      // changes (sbH), and a button no painter touches (Buttons, Shut down now) still shows its icon. Before, every button relied on a
+      // painter, and the two whose painter left with the relay card were blank squares in the rail.
       function sbMakeRailBtn(iconName, title, targetKey, onTap) {
         var b = document.createElement("button");
         b.type = "button";
         b.title = title;
+        sbH(b, sbIconSvg(iconName, 22, false));
         b.style.cssText = [
           "position:relative",
           "width:36px",
@@ -651,12 +658,14 @@
 
         sbBuildPowerCard(gGlobal);
 
-        // Versions of the Taller plugins loaded on this page (build.py
-        // injects them; see workshop.versions in _shared/10-registry.js).
-        sb.versions = sbText("", "font-size:10px;line-height:1.4;color:rgba(255,255,255,0.45);padding:0 4px;");
+        // The bar's OWN version (PLUGIN_VERSION, injected by build.py), written once: it never changes while the page lives. Only its own:
+        // the line used to list every workshop plugin loaded in the page (workshop.versions), so the bar seemed to carry the Workbench's or
+        // the Jog's version; the version of each plugin is DWC's Plugins page's business.
+        sb.versions = sbText(i18nT('sidebar.version', { version: PLUGIN_VERSION }), "font-size:10px;line-height:1.4;color:rgba(255,255,255,0.45);padding:0 4px;");
         full.appendChild(sb.versions);
 
         sbPanelUi = {};
+        sbTilesReset(); // 18-sidebar-tiles.js: the tiles other plugins offer are built again with the new bar
         document.body.appendChild(bar);
         sbOrderApplyAll();
         sidebarSetCollapsed(isSidebarCollapsed());
@@ -691,7 +700,8 @@
             ui.status = sbStatusLine(ui.card);
             ui.btn = sbMakeButton("", "#455a64", toggle);
             sbRow(ui.card).appendChild(ui.btn);
-            if (p.description) ui.card.appendChild(sbText(p.description));
+            if (p.description) ui.desc = ui.card.appendChild(sbText(p.description));
+            sbOpenBuild(ui); // 18-sidebar-open.js: the dot of the rail icon, the badge row of the card, buttons at the height of a finger
           }
           // appendChild moves the node: it leaves rail and cards in the order of `order`
           sb.railLocal.appendChild(ui.rail);
@@ -701,29 +711,18 @@
         sbOrderApply("local"); // the loop above re-adds them in registration order
       }
 
+      // An open panel looks open on its rail icon, its card and (Hidden style) its tile, for any registered panel: 09-panel-open.js decides,
+      // 18-sidebar-open.js paints (and 11-hidden-open.js, the tile)
       function sbRefreshPanels() {
         Object.keys(sbPanelUi).forEach(function (id) {
           var p = workshop.panels[id];
-          var ui = sbPanelUi[id];
           var st = {};
           try {
             st = p.state() || {};
           } catch (e) {
             console.error("[WorkshopControlBar] panel state " + id + ":", e);
           }
-          var name = p.title.toLowerCase();
-          sbT(ui.status, st.statusText || (st.open ? i18nT('sidebar.open_on_this_screen') : i18nT('sidebar.closed')));
-          ui.status.style.color = st.open ? "#a5d6a7" : "rgba(255,255,255,0.6)";
-          sbT(ui.btn, st.open ? i18nT('sidebar.close_name', { name: name }) : i18nT('sidebar.open_name', { name: name }));
-          ui.btn.style.background = st.open ? "#455a64" : "#1565c0";
-          ui.btn.disabled = !!st.disabled;
-          ui.btn.style.opacity = st.disabled ? "0.5" : "1";
-          // The rail icon is highlighted (blue) while its panel is open.
-          sbH(ui.rail, sbIconSvg(p.icon, 22, false));
-          ui.rail.style.background = st.open || st.busy ? "#1565c0" : "#37474f";
-          ui.rail.style.opacity = st.disabled ? "0.4" : "1";
-          ui.rail.title =
-            st.railTitle || (st.open ? i18nT('sidebar.panel_this_screen_only_open', { name: p.title }) : i18nT('sidebar.panel_this_screen_only_tap_to_open', { name: p.title }));
+          sbOpenPaintPanel(sbPanelUi[id], p, st);
         });
       }
 
@@ -733,14 +732,6 @@
         // Lanzadores locales (paneles de otros plugins)
         sbSyncPanels();
         sbRefreshPanels();
-        sb.versions.textContent =
-          i18nT('sidebar.versions') + " " +
-          Object.keys(workshop.versions || {})
-            .sort()
-            .map(function (id) {
-              return id.replace(/^(?:Workshop|Taller)/, "") + " " + workshop.versions[id].version;
-            })
-            .join(" · ");
 
         var pv = sbPowerView();
         sbPaintShutdownState(pv);
@@ -748,6 +739,7 @@
         sbPaintPowerTexts(pv);
         sbPaintShutdownWhen(pv);
         sbPaintTiming(pv);
+        sbRefreshTiles(); // 18-sidebar-tiles.js: the cards of the tiles other plugins offer, before the gear marks what is hidden
         if (typeof sbConfigApply === "function") sbConfigApply();
 
         sbRefreshNotice();
