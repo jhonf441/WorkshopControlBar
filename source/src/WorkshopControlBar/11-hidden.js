@@ -113,8 +113,8 @@
         ap.type = "button";
         ap.title = i18nT('hidden.shuts_down_the_system_and_cuts');
         ap.addEventListener("pointerdown", function (ev) { ev.stopPropagation(); ev.preventDefault(); });
-        sbArmedPress(ap, i18nT('sidebar.shut_down_now'), function () {
-          sbPowerMacroRun("shutdown-all.g"); // motion.ask first (19-sidebar-actions.js)
+        sbDangerPress(ap, function () {
+          sbPowerMacroRun("shutdown-all.g", i18nT('sidebar.shut_down_now'), i18nT('sidebar.shut_down_now_confirm')); // one risk box (19-sidebar-actions.js)
         });
         oc.footer.appendChild(ap);
         sidebarEl.appendChild(oc.footer);

@@ -3,13 +3,21 @@
 
       // Shut down now / Restart everything: the service decides first (motion.ask, class power: it asks the person to confirm, or refuses
       // while somebody else has the control), then the macro runs with C1 and does not ask again (without C1 it asks, M291 S3).
-      function sbPowerMacroRun(macro) {
+      // Shut down now / Restart everything: ONE confirmation, always, and it is a risk box (level 3): the one the service asks for when it
+      // wants it (motion.ask -> "confirm"), or else the bar's own with what will happen. Never two, never none: a single stray click on
+      // the page behind the panel cannot run the macro (the incident of 2026-10-26 was a click that landed on this button).
+      function sbPowerMacroRun(macro, title, text) {
         var info = {};
         workshopRequestMotion("", "power", macro, info)
           .then(function (ok) {
             if (!ok) return null;
-            // C1: the floating panel was accepted, so the macro does not ask a second time (M291)
-            return postCode('M98 P"0:/macros/power/' + macro + '"' + (info.confirmed ? " C1" : ""));
+            if (info.confirmed) return true; // the service asked and the person accepted its risk box
+            return workshopConfirmRisk({ title: title, text: text }); // the service allowed without asking: the bar asks
+          })
+          .then(function (go) {
+            if (!go) return null;
+            // C1: the person confirmed in a risk box, so the macro does not ask a second time (M291)
+            return postCode('M98 P"0:/macros/power/' + macro + '" C1');
           })
           .catch(function (e) {
             console.error("[WorkshopControlBar] error calling " + macro + ":", e);
@@ -18,42 +26,11 @@
           });
       }
 
-      // A destructive button (Shut down now, Restart everything) needs two presses: the first one arms it and shows a wait for
-      // SB_ARM_MS (a stray or double click cannot run it), the second one, once armed and within SB_ARM_WINDOW_MS, runs it. The service
-      // still asks its own OK / Cancel afterwards. The label is restored when the window closes.
-      var SB_ARM_MS = 1500;
-      var SB_ARM_WINDOW_MS = 6000;
-      function sbArmedPress(btn, label, run) {
-        var st = { at: 0, ready: false, t1: null, t2: null };
-        var base = { bg: btn.style.background, op: btn.style.opacity };
-        function reset() {
-          clearTimeout(st.t1);
-          clearTimeout(st.t2);
-          st.at = 0;
-          st.ready = false;
-          btn.style.background = base.bg;
-          btn.style.opacity = base.op;
-          btn.setAttribute("aria-disabled", "false");
-          sbT(btn, label);
-        }
+      // A destructive button (Shut down now, Restart everything): one press opens the risk box (sbPowerMacroRun); the press does not
+      // reach the page behind the panel. (It used to need two presses with a wait and then the service asked again: one box is enough.)
+      function sbDangerPress(btn, run) {
         btn.addEventListener("click", function (ev) {
           if (ev && ev.stopPropagation) ev.stopPropagation();
-          if (!st.at) {
-            st.at = Date.now();
-            btn.style.opacity = "0.6";
-            btn.setAttribute("aria-disabled", "true");
-            sbT(btn, i18nT('sidebar.press_wait'));
-            st.t1 = setTimeout(function () {
-              st.ready = true;
-              btn.style.opacity = base.op;
-              btn.setAttribute("aria-disabled", "false");
-              sbT(btn, i18nT('sidebar.press_again'));
-            }, SB_ARM_MS);
-            st.t2 = setTimeout(reset, SB_ARM_MS + SB_ARM_WINDOW_MS);
-            return;
-          }
-          if (!st.ready) return; // still arming: the press is ignored
-          reset();
           run();
         });
       }

@@ -258,19 +258,18 @@
         powerCard.appendChild(sep0);
         var nowRow = sbRow(powerCard);
         var nowBtn = sbMakeButton(i18nT('sidebar.shut_down_now'), "#c62828", function () {});
-        // two presses with an arming delay: a stray click on the page behind the panel cannot shut the machine down
-        sbArmedPress(nowBtn, i18nT('sidebar.shut_down_now'), function () {
-          // motion.ask first (class power), then the macro with C1 (no second question): 19-sidebar-actions.js
-          sbPowerMacroRun("shutdown-all.g");
+        // one press, one risk box (19-sidebar-actions.js): a stray click on the page behind the panel cannot shut the machine down
+        sbDangerPress(nowBtn, function () {
+          sbPowerMacroRun("shutdown-all.g", i18nT('sidebar.shut_down_now'), i18nT('sidebar.shut_down_now_confirm'));
         });
         nowRow.appendChild(nowBtn);
         sb.nowText = sbText("");
         powerCard.appendChild(sb.nowText);
         var resetRow = sbRow(powerCard);
         var resetBtn = sbMakeButton(i18nT('sidebar.restart_everything'), "#5e35b1", function () {});
-        sbArmedPress(resetBtn, i18nT('sidebar.restart_everything'), function () {
-          // The same as Shut down now: motion.ask (floating panel), then the macro.
-          sbPowerMacroRun("full-reset.g");
+        sbDangerPress(resetBtn, function () {
+          // The same as Shut down now: one risk box, then the macro.
+          sbPowerMacroRun("full-reset.g", i18nT('sidebar.restart_everything'), i18nT('sidebar.restart_everything_confirm'));
         });
         resetRow.appendChild(resetBtn);
         var resetHelp = sbText(i18nT('sidebar.restart_everything_help'));

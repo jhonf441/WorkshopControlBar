@@ -1,5 +1,9 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.14 -- 2026-11-03
+
+- Shutdown now / restart everything: one risk box, no double press
+
 ## 2.7.13 -- 2026-11-03
 
 - Rail icons drawn when the button is created, bar shows only its own version, fold chevron as SVG, section select outside the label
