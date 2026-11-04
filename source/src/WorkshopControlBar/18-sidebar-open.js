@@ -2,7 +2,7 @@
       // What an open panel looks like is decided in 09-panel-open.js (sbOpenView); this file paints it on the two launchers of
       // 10-sidebar.js (sbSyncPanels builds them, sbRefreshPanels paints them) and holds the pieces the tile of the Hidden style shares
       // (11-hidden-open.js): the style tag and the badge. An open panel: accent fill, white words, a ring, a dot that pulses softly, and the
-      // action says "Close". A closed one keeps the quiet look it always had.
+      // only action is a small X. A closed one keeps the quiet look it always had.
 
       // The style tag with the pulse (once per page; it is created the first time a panel is painted, so a bar with no panels adds nothing)
       function sbOpenStyle() {
@@ -80,11 +80,19 @@
         if (v.on) ui.card.style.setProperty("background", SB_OPEN_FILL, "important");
         else ui.card.style.setProperty("background", "rgba(0,0,0,0.25)");
         ui.card.style.border = v.on ? "2px solid " + SB_OPEN_RING : "";
-        sbOpenBadge(ui.status, v.on, st.statusText || (v.open ? i18nT("sidebar.open_on_this_screen") : i18nT("sidebar.closed")));
+        sbOpenBadge(ui.status, v.on, st.statusText || (v.open ? "" : i18nT("sidebar.closed")));
         ui.status.style.color = v.on ? SB_OPEN_TEXT : "rgba(255,255,255,0.6)";
         ui.status.style.fontWeight = v.on ? "700" : "bold";
         if (ui.desc) ui.desc.style.color = v.on ? SB_OPEN_TEXT : "rgba(255,255,255,0.7)";
-        sbT(ui.btn, v.open ? i18nT("sidebar.close_name", { name: name }) : i18nT("sidebar.open_name", { name: name }));
+        // Open: one small X (40 px target) with its accessible name and tooltip; closed: the "Open {name}" button as ever
+        var label = v.open ? i18nT("sidebar.close_name", { name: name }) : i18nT("sidebar.open_name", { name: name });
+        if (v.open) sbH(ui.btn, sbIconSvg("close", 18, false));
+        else sbT(ui.btn, label);
+        ui.btn.style.flex = v.open ? "0 0 auto" : "1 1 auto";
+        ui.btn.style.minWidth = v.open ? SB_OPEN_TOUCH + "px" : "";
+        ui.btn.style.marginLeft = v.open ? "auto" : "";
+        ui.btn.title = label;
+        ui.btn.setAttribute("aria-label", label);
         ui.btn.style.background = v.on ? SB_OPEN_BTN : SB_OPEN_FILL;
         ui.btn.style.color = v.on ? SB_OPEN_BTN_TEXT : SB_OPEN_TEXT;
         ui.btn.setAttribute("aria-pressed", v.open ? "true" : "false");

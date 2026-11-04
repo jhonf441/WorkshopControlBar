@@ -2,7 +2,7 @@
   "id": "WorkshopControlBar",
   "name": "Control Bar",
   "author": "jhonf441",
-  "version": "2.7.14",
+  "version": "2.7.17",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/jhonf441/WorkshopControlBar",
   "tags": [
@@ -30,7 +30,7 @@
     "sys/workshop/examples/WorkshopControlBar/macros/psu/stop.g"
   ],
   "dwcFiles": [
-    "js/WorkshopControlBar.9c8e2ab3.js",
-    "js/WorkshopControlBar.9c8e2ab3.js.gz"
+    "js/WorkshopControlBar.4f91063c.js",
+    "js/WorkshopControlBar.4f91063c.js.gz"
   ]
 }

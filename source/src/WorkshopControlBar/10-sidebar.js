@@ -78,6 +78,7 @@
           '<path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h8v8h-8v-8zm2 2v4h4v-4h-4z"/>',
         bell:
           '<path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>',
+        close: '<path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>', // the X of an open panel's one close control
         fold: '<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>', // chevron down: the fold mark of a card (turns when it is folded)
       };
 
@@ -391,10 +392,36 @@
         setTimeout(function () { window.dispatchEvent(new Event("resize")); }, 60);
       }
 
+      // Space the bar leaves under it so its last rows can always be scrolled into view: the gap to the bottom of the VISIBLE area (the
+      // layout viewport can be taller than what shows when the browser has its own bars or an on-screen keyboard) and DWC's bottom navigation
+      // of tablets ("Show bottom navigation on tablets", fixed over the page bottom). Pure: layoutH = window.innerHeight, visibleBottom = the
+      // visual viewport's bottom edge (offsetTop + height) or layoutH when unknown, navTop = top edge of the bottom navigation or -1 when none.
+      function sbBottomInset(layoutH, visibleBottom, navTop) {
+        var gap = 10;
+        if (visibleBottom > 0 && visibleBottom < layoutH) gap = Math.max(gap, Math.ceil(layoutH - visibleBottom) + 10);
+        if (navTop > 0 && navTop < layoutH) gap = Math.max(gap, Math.ceil(layoutH - navTop) + 6);
+        return Math.min(gap, Math.round(layoutH * 0.4));
+      }
+      function sbBottomNow() {
+        var vv = window.visualViewport;
+        var navTop = -1;
+        try {
+          var nav = document.querySelector(".v-bottom-navigation");
+          if (nav && !sidebarEl.contains(nav)) {
+            var r = nav.getBoundingClientRect();
+            if (r.height > 0 && r.width > 0) navTop = r.top;
+          }
+        } catch (e) {
+          /* no navigation found */
+        }
+        return sbBottomInset(window.innerHeight, vv ? vv.offsetTop + vv.height : window.innerHeight, navTop);
+      }
+
       function sbPlace() {
         if (!sidebarEl) return;
         var top = sbTopOffset();
         sidebarEl.style.setProperty("--tp-sb-top", top + "px");
+        sidebarEl.style.setProperty("--tp-sb-bottom", sbBottomNow() + "px");
         if (sbHidden.zone) sbHidden.zone.style.top = top + "px";
         if (sbHidden.tab) sbHidden.tab.style.top = Math.round(top + (window.innerHeight - top) / 2) + "px";
         sbHidden.top = top;
@@ -466,6 +493,7 @@
         window.addEventListener("resize", sbPlace);
         window.addEventListener("resize", sbApplyPush);
         window.addEventListener("orientationchange", sbPlace);
+        if (window.visualViewport) window.visualViewport.addEventListener("resize", sbPlace);
         setInterval(sbOcultaUbicar, 2000); // the scrollbar appears / disappears when the page changes
         // mouse: leaving the bar hides it (except gear or order open)
         sidebarEl.addEventListener("pointerenter", function () { clearTimeout(sbHidden.timer); });
@@ -518,7 +546,7 @@
         var st = document.createElement("style");
         st.id = "workshop-bar-hidden-css";
         st.textContent = [
-          B + "{top:var(--tp-sb-top,10px)!important;bottom:10px!important;right:10px!important;border-radius:16px!important;border:1px solid rgba(255,255,255,0.14)!important;background:#1e272c!important;box-shadow:0 12px 40px rgba(0,0,0,0.65)!important;}",
+          B + "{top:var(--tp-sb-top,10px)!important;bottom:var(--tp-sb-bottom,10px)!important;right:10px!important;border-radius:16px!important;border:1px solid rgba(255,255,255,0.14)!important;background:#1e272c!important;box-shadow:0 12px 40px rgba(0,0,0,0.65)!important;}",
           B + ">div:first-child{background:transparent!important;border-bottom:1px solid rgba(255,255,255,0.08)!important;padding:8px 10px!important;}",
           // closed as a rail (44 px): only the toggle fits, centred (the gear and title are hidden)
           B + '[data-sb-closed="1"]>div:first-child{padding:8px 0!important;justify-content:center!important;gap:0!important;}',
@@ -630,7 +658,7 @@
         // -- cuerpo con scroll propio --
         var scroller = document.createElement("div");
         scroller.style.cssText =
-          "flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;";
+          "flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));scroll-padding-bottom:24px;";
         bar.appendChild(scroller);
         sb.scroller = scroller;
 

@@ -1,13 +1,15 @@
       // ---- The tile of a panel in the Hidden style: how it says "open" (2026-10-31) ----
       // The tile of THIS SCREEN is the switch of its panel. Open (09-panel-open.js decides, for any registered panel): the tile is filled with the
-      // accent, the second line is the badge "dot (pulses softly) + Open" and, at its right, the action "Close"; the ring and the pressed state
+      // accent, the second line is the badge "dot (pulses softly)" (plus the panel's own words, if it gave any) and, at its right, a small X; no "Open" word; the ring and the pressed state
       // for assistive technology say it too. Closed: the quiet tile it always was ("Closed"). Not only colour: the words and the dot change.
 
       // The second line of a panel tile: [badge ........ action]. Built once (the nodes stay, so the pulse is never restarted by a repaint).
       function ocOpenTileBuild(t) {
         t._est.style.cssText = "display:flex;align-items:center;gap:8px;min-width:0;font-size:11px;color:#b0bec5;";
         t._badge = ocEl("span", "flex:1 1 auto;min-width:0;display:flex;align-items:center;");
-        t._cue = ocEl("span", "flex:none;display:none;font-size:11px;font-weight:600;text-decoration:underline;color:" + SB_OPEN_TEXT + ";");
+        t._cue = ocEl("span", "flex:none;display:none;color:" + SB_OPEN_TEXT + ";"); // the X: decoration only, the tile itself is the toggle
+        t._cue.setAttribute("aria-hidden", "true");
+        sbH(t._cue, sbIconSvg("close", 16, false));
         t._est.appendChild(t._badge);
         t._est.appendChild(t._cue);
       }
@@ -37,8 +39,7 @@
         t.setAttribute("aria-pressed", v.open ? "true" : "false");
         t.dataset.sbOpen = v.on ? "1" : "0";
         ocOpenTileSurface(t, v);
-        var word = v.open ? i18nT("hidden.open") : v.busy ? s.statusText || i18nT("sidebar.panel_busy") : i18nT("sidebar.closed");
+        var word = v.open ? s.statusText || "" : v.busy ? s.statusText || i18nT("sidebar.panel_busy") : i18nT("sidebar.closed");
         sbOpenBadge(t._badge, v.on, word);
         t._cue.style.display = v.open ? "" : "none";
-        sbT(t._cue, i18nT("common.close"));
       }

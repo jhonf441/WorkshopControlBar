@@ -1,5 +1,22 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.17 -- 2026-11-03
+
+- Session: notice redesigned as a console card, permission messages marked
+
+## 2.7.16 -- 2026-11-03
+
+- Session: notice also when the token is expired (login_required)
+
+## 2.7.15 -- 2026-11-03
+
+- Bar: minimal open card (one X), bottom inset and padding so the last rows can be reached, standard session notice
+
+## Unreleased
+
+- The bar's own scroll always reaches its last row: the bar keeps clear of the browser's bars and of DWC's bottom navigation of tablets (its bottom follows the visible area and is re-measured on resize, orientation and visual viewport changes), the scroller has room at its end and pans vertically by touch
+- Open panels are minimal: no "Open" word; the card has one small X (40 px, tooltip and accessible name Close), the Hidden-style tile shows the pulsing dot and a small X
+
 ## 2.7.14 -- 2026-11-03
 
 - Shutdown now / restart everything: one risk box, no double press

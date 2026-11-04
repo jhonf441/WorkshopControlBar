@@ -277,6 +277,10 @@ Risk: **Medium (buttons that shut the machine down or run your macros)**. Read t
 **What it needs outside the zip** (each one is a separate step you do on purpose and can undo):
 - the shutdown and restart buttons need the optional sudo rule of the service (`/etc/sudoers.d/dsf-power`)
 
+**How to: the shutdown / restart rule**
+
+"Shut down now", "Shut down when done" and the full restart run `sudo -n shutdown` / `sudo -n reboot` as the `dsf` user, so they need the sudoers rule. Create it, check it and undo it as described in the section "How to: the shutdown / restart rule (sudoers)" of WorkshopService: `sudo visudo -f /etc/sudoers.d/dsf-power`, line `dsf ALL=(root) NOPASSWD: /usr/sbin/shutdown, /usr/sbin/reboot`, check with `sudo visudo -c`, undo with `sudo rm /etc/sudoers.d/dsf-power`. Without it the buttons log an error and the system keeps running.
+
 **Safety notes:**
 - "Shut down now" cuts the power of EVERYTHING through the Tuya breaker if you configured one; it asks for confirmation.
 
