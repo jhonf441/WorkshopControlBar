@@ -55,7 +55,7 @@
         var ui = { key: key, api: api, card: card, buttons: {}, last: {}, watching: false };
         ui.status = sbStatusLine(card);
         ui.row = sbRow(card);
-        ui.msg = sbMsgLine("font-size:11px;color:#ffe082;");
+        ui.msg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         card.appendChild(ui.msg);
         if (api.help) card.appendChild(sbText(api.help));
         ui.rail = sbMakeRailBtn(api.icon, api.title, key);

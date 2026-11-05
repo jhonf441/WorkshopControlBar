@@ -5,7 +5,7 @@
       
       function sbControlMount(head) {
         var chip = document.createElement("div");
-        chip.style.cssText = "display:none;flex:0 1 auto;align-items:center;gap:6px;min-width:0;font-size:11px;color:#ffcc80;";
+        chip.style.cssText = "display:none;flex:0 1 auto;align-items:center;gap:6px;min-width:0;font-size:11px;color:var(--wf-n-down-text,#ffcc80);";
         head.appendChild(chip);
         var key = "";
         function paint() {

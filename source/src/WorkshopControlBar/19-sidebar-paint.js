@@ -44,7 +44,7 @@
         Object.keys(sb.methodButtons).forEach(function (k) {
           var on = !!met && met.method === k;
           sb.methodButtons[k].style.background = on ? "#1565c0" : "#37474f";
-          sb.methodButtons[k].style.border = on ? "2px solid #90caf9" : "2px solid transparent";
+          sb.methodButtons[k].style.border = on ? "2px solid var(--wf-n-session-text,#90caf9)" : "2px solid transparent";
           sb.methodButtons[k].disabled = !met;
           sb.methodButtons[k].style.opacity = met ? "1" : "0.5";
         });
@@ -75,7 +75,7 @@
           ["0", "1"].forEach(function (k) {
             var on = String(rc.power_off_with || 0) === k;
             sb.relayVal[k].style.background = on ? "#1565c0" : "#37474f";
-            sb.relayVal[k].style.border = on ? "2px solid #90caf9" : "2px solid transparent";
+            sb.relayVal[k].style.border = on ? "2px solid var(--wf-n-session-text,#90caf9)" : "2px solid transparent";
           });
         }
       }
@@ -142,7 +142,7 @@
           sb.timingCancelBtn.style.display = sbTiming ? "" : "none";
           sbT(sb.timingMsg, sbTimingMsg);
           if (sbTiming) {
-            sb.railTimer.style.background = "#ff8f00";
+            sb.railTimer.style.background = "var(--wf-armed,#ff8f00)";
             sb.railTimer.title = i18nT('sidebar.scheduled_shutdown_at', { time: sbTiming.until }) + (armed ? " | " + i18nT('sidebar.shut_down_when_done_armed') : "");
             sbT(sb.railTimerLabel, missingMin + "m");
           }

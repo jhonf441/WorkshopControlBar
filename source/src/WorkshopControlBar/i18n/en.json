@@ -1,7 +1,7 @@
 {
 	"sidebar": {
-		"hidden_needs_session": "Some parts need you to sign in",
-		"hidden_needs_role": "Some parts need another role",
+		"hidden_needs_session": "Some parts are hidden until you sign in.",
+		"hidden_needs_role": "Some parts are hidden because they require another role. Your role: {role}. Ask an administrator for access.",
 		"signed_out_login": "No session · Sign in",
 		"confirm": "Confirm",
 		"turn_off_in_timer": "Turn off in... (timer)",
@@ -348,5 +348,12 @@
 		"modal_sub": "Get the files used by the bar buttons ready",
 		"strip_text": "{n} left to set up for the bar",
 		"strip_button": "Set up"
+	},
+	"helpTips": {
+		"bar_card_section_title": "Card section",
+		"bar_card_section_what": "The section of the bar in which this card is shown on this screen.",
+		"bar_card_section_why": "Each screen can arrange the cards its own way, without changing the others.",
+		"bar_card_section_missing": "If you do not choose, the card is shown in the section it came with.",
+		"bar_card_section_how": "Choose \"Its section\" or an own section of this screen in the list next to it."
 	}
 }

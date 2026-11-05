@@ -79,8 +79,8 @@
         }
       }
 
-      // The quiet line at the end of the bar: something was hidden by the session or the role. Signed out it also offers the sign-in (the bar has no .wf-bar,
-      // so the shared chip does not reach it).
+      // The note at the end of the bar (N2 of the standard): something was hidden by the session or the role. The bar has no .wf-bar, so the shared chip does not
+      // reach it: signed out the note itself offers the sign-in (a surface without a bar), a role has no button.
       function sbRoleNotePaint(v) {
         var full = sb.full;
         if (!full) return;
@@ -91,25 +91,14 @@
           if (box) box.style.display = "none";
           return;
         }
-        if (!box) {
-          box = document.createElement("div");
-          box.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:11px;line-height:1.35;color:rgba(255,255,255,0.55);";
-          sb.roleNoteText = document.createElement("div");
-          sb.roleNoteLogin = document.createElement("button");
-          sb.roleNoteLogin.type = "button";
-          sb.roleNoteLogin.style.cssText = "padding:0;border:0;background:transparent;color:#ffb74d;font:500 11px Roboto,Helvetica,Arial,sans-serif;cursor:pointer;text-align:left;";
-          sb.roleNoteLogin.addEventListener("click", function () {
-            if (typeof workshopLogin === "function") workshopLogin();
-          });
-          box.appendChild(sb.roleNoteText);
-          box.appendChild(sb.roleNoteLogin);
+        var key = kind + "|" + (typeof workshopNoticeStamp === "function" ? workshopNoticeStamp() : "");
+        if (!box || sb.roleNoteKey !== key) {
+          if (box && box.parentElement) box.parentElement.removeChild(box);
+          var text = kind === "signed_out" ? workshopSessionSentence("sidebar.hidden_needs_session") : i18nT("sidebar.hidden_needs_role", { role: workshopNoticeRoleName(typeof workshopRole === "function" ? workshopRole() : "") });
+          box = workshopNoticeEl(kind === "signed_out" ? "session" : "role", "section", { text: text, action: kind === "signed_out" ? "sign-in" : "" });
           sb.roleNote = box;
+          sb.roleNoteKey = key;
         }
         if (box.parentElement !== full || full.lastElementChild !== box) full.appendChild(box);
-        box.style.display = "flex";
-        var text = i18nT(kind === "signed_out" ? "sidebar.hidden_needs_session" : "sidebar.hidden_needs_role");
-        if (sb.roleNoteText.textContent !== text) sb.roleNoteText.textContent = text;
-        sb.roleNoteLogin.style.display = kind === "signed_out" ? "block" : "none";
-        var login = i18nT("sidebar.signed_out_login");
-        if (sb.roleNoteLogin.textContent !== login) sb.roleNoteLogin.textContent = login;
+        box.style.display = "";
       }

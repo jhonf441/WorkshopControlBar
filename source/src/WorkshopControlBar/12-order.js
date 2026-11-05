@@ -238,6 +238,7 @@
         var r = document.createElement("div");
         r.style.cssText = "display:flex;align-items:center;gap:8px;";
         r.appendChild(l);
+        r.appendChild(workshopHelpTipOf("bar_card_section"));
         r.appendChild(sbConfigSectionSelect(cardKey));
         items.appendChild(r);
       }

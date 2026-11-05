@@ -34,7 +34,7 @@
         sb.liveStopBtn.title = i18nT('sidebar.live_stop_tip');
         sb.liveStopBtn.setAttribute("aria-label", i18nT('sidebar.live_stop_button'));
         strip.appendChild(sb.liveStopBtn);
-        sb.liveStopMsg = sbMsgLine("flex:1 1 100%;font-size:11px;color:#ffe082;");
+        sb.liveStopMsg = sbMsgLine("flex:1 1 100%;font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         strip.appendChild(sb.liveStopMsg);
         bar.appendChild(strip);
         sb.liveStopStrip = strip;
@@ -47,7 +47,7 @@
         }); // the icon is drawn by sbMakeRailBtn
         sb.railLiveStop.style.display = "none";
         sb.railLiveStop.style.background = "#b26a00";
-        sb.railLiveStop.style.borderColor = "#ffb74d";
+        sb.railLiveStop.style.borderColor = "var(--wf-n-down-text,#ffb74d)";
         rail.appendChild(sb.railLiveStop);
       }
 
@@ -75,10 +75,10 @@
         sb.liveStopBtn.style.alignItems = "center";
         sb.liveStopBtn.style.justifyContent = "center";
         sb.liveStopBtn.style.gap = "6px";
-        sb.liveStopDot.style.cssText = "flex:none;width:8px;height:8px;border-radius:50%;background:" + (sbLiveJob ? "#ffb74d" : "#78909c") + ";box-shadow:" + (sbLiveJob ? "0 0 6px #ffb74d" : "none") + ";";
+        sb.liveStopDot.style.cssText = "flex:none;width:8px;height:8px;border-radius:50%;background:" + (sbLiveJob ? "var(--wf-n-down-text,#ffb74d)" : "#78909c") + ";box-shadow:" + (sbLiveJob ? "0 0 6px var(--wf-n-down-text,#ffb74d)" : "none") + ";";
         sbT(sb.liveStopMsg, sbLiveStopMsg);
         sb.liveStopMsg.style.display = sbLiveStopMsg ? "block" : "none";
-        sb.liveStopMsg.style.color = sbLiveStopOk ? "#ffe082" : "#ef9a9a";
+        sb.liveStopMsg.style.color = sbLiveStopOk ? "var(--wf-n-down-text,#ffe082)" : "#ef9a9a";
       }
 
       function sbLiveStopRun() {

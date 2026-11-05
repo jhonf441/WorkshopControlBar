@@ -8,7 +8,7 @@
 
       var SB_OPEN_FILL = "#1565c0"; // the accent fill (the blue of every chosen thing of the bar): white text on it is 5.75:1, AA asks 4.5
       var SB_OPEN_TEXT = "#ffffff";
-      var SB_OPEN_RING = "#90caf9"; // the ring of an open panel; the light theme of the page darkens it by itself (_shared/03-theme.js)
+      var SB_OPEN_RING = "var(--wf-n-session-text,#90caf9)"; // the ring of an open panel; the light theme of the page darkens it by itself (_shared/03-theme.js)
       var SB_OPEN_DOT = "#69f0ae"; // the live dot, 4:1 against the fill (a graphic needs 3)
       var SB_OPEN_BTN = "#ffffff"; // the "Close" button on a filled card: white with dark text, 9:1
       var SB_OPEN_BTN_TEXT = "#0d47a1";

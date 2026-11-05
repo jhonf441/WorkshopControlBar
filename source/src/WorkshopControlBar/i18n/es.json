@@ -1,7 +1,7 @@
 {
 	"sidebar": {
-		"hidden_needs_session": "Hay partes que necesitan iniciar sesión",
-		"hidden_needs_role": "Hay partes que necesitan otro rol",
+		"hidden_needs_session": "Hay partes ocultas que requieren iniciar sesión.",
+		"hidden_needs_role": "Hay partes ocultas que requieren otro rol. Tu rol: {role}. Pide el acceso a un administrador.",
 		"signed_out_login": "Sin sesión · Iniciar sesión",
 		"confirm": "Confirmar",
 		"turn_off_in_timer": "Apagar en... (temporizador)",
@@ -348,5 +348,12 @@
 		"modal_sub": "Deja listos los archivos que usan los botones de la barra",
 		"strip_text": "Faltan {n} por configurar en la barra",
 		"strip_button": "Configurar"
+	},
+	"helpTips": {
+		"bar_card_section_title": "Sección de la tarjeta",
+		"bar_card_section_what": "La sección de la barra en la que se ve esta tarjeta en esta pantalla.",
+		"bar_card_section_why": "Cada pantalla puede ordenar las tarjetas a su manera, sin cambiar las de las demás.",
+		"bar_card_section_missing": "Sin elegir, la tarjeta se ve en la sección con la que viene.",
+		"bar_card_section_how": "Elige \"Su sección\" o una sección propia de esta pantalla en la lista de al lado."
 	}
 }

@@ -81,7 +81,7 @@
           (fault && !off
             ? '<span style="position:absolute;right:2px;top:2px;width:8px;height:8px;border-radius:50%;background:#ef5350;pointer-events:none"></span>'
             : "");
-        sb.railNotice.style.background = sil ? "#ff8f00" : "#37474f";
+        sb.railNotice.style.background = sil ? "var(--wf-armed,#ff8f00)" : "#37474f";
         sb.railNotice.title = i18nT('sidebar.phone_notifications_global_state', { state: txt });
       }
 

@@ -11,7 +11,7 @@
         sbOrderRegister("sections", full);
         sb.orderHint = sbText(
           i18nT('sidebar.arrange_hint'),
-          "display:none;font-size:11px;line-height:1.35;color:#ffe082;background:rgba(255,224,130,0.1);border-radius:6px;padding:6px;"
+          "display:none;font-size:11px;line-height:1.35;color:var(--wf-n-down-text,#ffe082);background:rgba(255,224,130,0.1);border-radius:6px;padding:6px;"
         );
         full.appendChild(sb.orderHint);
         // panel del engranaje (lo llena sbConfigRender, 12-order.js)
@@ -143,7 +143,7 @@
         rail.appendChild(sb.railTimer);
         // Label visible under the clock when the shutdown is armed --
         // it has to be seen even if the bar is collapsed.
-        sb.railTimerLabel = sbText("", "font-size:10px;font-weight:bold;color:#ffb74d;text-align:center;width:100%;");
+        sb.railTimerLabel = sbText("", "font-size:10px;font-weight:bold;color:var(--wf-n-down-text,#ffb74d);text-align:center;width:100%;");
         rail.appendChild(sb.railTimerLabel);
         sb.railNotice = sbMakeRailBtn("bell", i18nT('sidebar.phone_notifications_global'), "notificationCard");
         rail.appendChild(sb.railNotice);
@@ -168,7 +168,7 @@
         });
         sb.noticeSettingsBtn.style.display = "none";
         notifRow.appendChild(sb.noticeSettingsBtn);
-        sb.noticeMsg = sbMsgLine("font-size:11px;color:#ffe082;");
+        sb.noticeMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         notifCard.appendChild(sb.noticeMsg);
         sb.noticeHelp = sbText("");
         notifCard.appendChild(sb.noticeHelp);
@@ -240,13 +240,13 @@
         });
         sb.methodDesc = sbText("", "font-size:12px;line-height:1.35;color:#fff;");
         powerCard.appendChild(sb.methodDesc);
-        sb.methodNotice = sbMsgLine("font-size:11px;color:#ffb74d;");
+        sb.methodNotice = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffb74d);");
         powerCard.appendChild(sb.methodNotice);
         sb.methodHelp = sbText(
           i18nT('sidebar.meter_the_smart_meter_or_switch')
         );
         powerCard.appendChild(sb.methodHelp);
-        sb.methodMsg = sbMsgLine("font-size:11px;color:#ffe082;");
+        sb.methodMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.methodMsg);
         sb.powerMethodEls = [sb.methodTitle, sb.methodRow, sb.methodPi, sb.relayRow, sb.methodDesc, sb.methodNotice, sb.methodHelp, sb.methodMsg]; // role: technician (09-role.js)
       }
@@ -292,9 +292,9 @@
         endRow.appendChild(sb.shutdownBtn);
         sb.shutdownContext = sbText("");
         powerCard.appendChild(sb.shutdownContext);
-        sb.shutdownMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:#90caf9;");
+        sb.shutdownMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
         powerCard.appendChild(sb.shutdownMethodLn);
-        sb.shutdownMsg = sbMsgLine("font-size:11px;color:#ffe082;");
+        sb.shutdownMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.shutdownMsg);
         sb.powerWhenDoneEls = [sep, sb.shutdownStatus, endRow, sb.shutdownContext, sb.shutdownMethodLn, sb.shutdownMsg]; // role: operator
       }
@@ -346,11 +346,11 @@
           sbTimingAction(null);
         });
         tempoRow2.appendChild(sb.timingCancelBtn);
-        sb.timingMsg = sbMsgLine("font-size:11px;color:#ffe082;");
+        sb.timingMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.timingMsg);
         sb.timingText = sbText("");
         powerCard.appendChild(sb.timingText);
-        sb.timingMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:#90caf9;");
+        sb.timingMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
         powerCard.appendChild(sb.timingMethodLn);
         sb.powerTimerEls = [sep2, sb.timingStatus, sb.timingRow, tempoRow2, sb.timingMsg, sb.timingText, sb.timingMethodLn]; // role: operator
       }

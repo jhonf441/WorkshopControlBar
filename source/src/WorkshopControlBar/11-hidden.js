@@ -263,12 +263,12 @@
 
       var OC_STATES = {
         idle: [i18nT('hidden.idle'), "rgba(102,187,106,0.18)", "#a5d6a7", "ok"],
-        processing: [i18nT('hidden.processing'), "rgba(66,165,245,0.2)", "#90caf9", "info"],
-        simulating: [i18nT('hidden.simulating'), "rgba(66,165,245,0.2)", "#90caf9", "info"],
-        paused: [i18nT('hidden.paused'), "rgba(255,152,0,0.2)", "#ffb74d", "warn"],
-        pausing: [i18nT('hidden.pausing'), "rgba(255,152,0,0.2)", "#ffb74d", "warn"],
-        resuming: [i18nT('hidden.resuming'), "rgba(66,165,245,0.2)", "#90caf9", "info"],
-        busy: [i18nT('hidden.busy'), "rgba(255,152,0,0.2)", "#ffb74d", "warn"],
+        processing: [i18nT('hidden.processing'), "rgba(66,165,245,0.2)", "rgb(144,202,249)", "info"],
+        simulating: [i18nT('hidden.simulating'), "rgba(66,165,245,0.2)", "rgb(144,202,249)", "info"],
+        paused: [i18nT('hidden.paused'), "rgba(255,152,0,0.2)", "rgb(255,183,77)", "warn"],
+        pausing: [i18nT('hidden.pausing'), "rgba(255,152,0,0.2)", "rgb(255,183,77)", "warn"],
+        resuming: [i18nT('hidden.resuming'), "rgba(66,165,245,0.2)", "rgb(144,202,249)", "info"],
+        busy: [i18nT('hidden.busy'), "rgba(255,152,0,0.2)", "rgb(255,183,77)", "warn"],
         halted: [i18nT('hidden.halted'), "rgba(239,83,80,0.2)", "#ef9a9a", "err"],
         // RRF "off": the board has no motor power (Vin low), DWC and the Pi are connected. "disconnected" is the real loss of the connection.
         off: [i18nT('hidden.machine_off'), "rgba(158,158,158,0.2)", "#cfd8dc", ""],
@@ -319,11 +319,11 @@
         // global
         var sil = sbNoticeMuted();
         sbT(oc.tNotices._est, !sbNotice ? i18nT('hidden.no_data') : sil ? i18nT('hidden.muted') : i18nT('hidden.active'));
-        oc.tNotices._est.style.color = sil ? "#ffb74d" : "#a5d6a7";
+        oc.tNotices._est.style.color = sil ? "var(--wf-n-down-text,#ffb74d)" : "#a5d6a7";
         var arm = sbPowerOffArmed === true;
         var txt = sbTiming ? i18nT('hidden.scheduled_at', { time: sbTiming.until }) : arm ? i18nT('hidden.armed_when_the_job_ends') : i18nT('hidden.nothing_scheduled');
         sbT(oc.tShutdown._est, txt);
-        oc.tShutdown._est.style.color = sbTiming || arm ? "#ffb74d" : "#b0bec5";
+        oc.tShutdown._est.style.color = sbTiming || arm ? "var(--wf-n-down-text,#ffb74d)" : "#b0bec5";
         oc.tShutdown.style.borderColor = sbTiming || arm ? "rgba(255,152,0,0.5)" : "rgba(128,128,128,0.3)";
         ocPaintTiles(); // 11-hidden-tiles.js
         ocHiddenFlags();

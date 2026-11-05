@@ -1065,7 +1065,7 @@
           else btnRenderGroupForm(fb);
         }
 
-        if (btnMsg && btnMsgGroup === g.id) card.appendChild(sbText(btnMsg, "font-size:11px;color:#ffe082;word-break:break-word;"));
+        if (btnMsg && btnMsgGroup === g.id) card.appendChild(sbText(btnMsg, "font-size:11px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
         if (g.description && !btnEditing) card.appendChild(sbText(g.description));
 
         if (btnEditing && !(btnForm && btnForm.g === gi)) {
@@ -1114,7 +1114,7 @@
           } else sb.btnGroups.appendChild(fb);
           btnRenderGroupForm(fb);
         }
-        if (btnMsg && btnMsgGroup === null) sb.btnGroups.appendChild(sbText(btnMsg, "font-size:11px;color:#ffe082;word-break:break-word;"));
+        if (btnMsg && btnMsgGroup === null) sb.btnGroups.appendChild(sbText(btnMsg, "font-size:11px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
         sb.btnNewGroupBtn.style.display = btnEditing && !btnForm ? "" : "none";
         sbT(sb.btnEditBtn, btnEditing ? i18nT('common.done') : i18nT('common.edit_buttons'));
         sb.btnEditBtn.style.background = btnEditing ? "#2e7d32" : "#37474f";

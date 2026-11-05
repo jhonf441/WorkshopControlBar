@@ -1,5 +1,13 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.27 -- 2026-11-05
+
+- Session state, refusals and notices unified; errors kept as objects; 403 names the action
+
+## 2.7.26 -- 2026-11-05
+
+- Session notices and help standard: one voice for sign-in and role refusals, shared help tips, identity change resets what the session showed
+
 ## 2.7.25 -- 2026-11-05
 
 - Darker primary button hover, Workbench save label, generic RS485 notes
