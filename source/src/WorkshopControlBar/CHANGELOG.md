@@ -1,5 +1,13 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.24 -- 2026-11-05
+
+- Mode buttons say active only when the model shows the mode
+
+## 2.7.23 -- 2026-11-04
+
+- Sign out no longer reopens the PIN dialog
+
 ## 2.7.22 -- 2026-11-04
 
 - Bar placement and the hidden-style tab write styles only when a number changed (they ran every 1-2 s and forced a layout each time)

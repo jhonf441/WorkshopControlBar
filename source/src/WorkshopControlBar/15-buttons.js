@@ -453,8 +453,7 @@
             return r.text();
           })
           .then(function (txt) {
-            txt = String(txt || "").trim();
-            if (seq === btnSendSeq) btnMsg = b.label + ": " + (txt ? txt.slice(0, 160) : i18nT('buttons.done_lower'));
+            return btnAfterReply(b, seq, txt); // a mode button waits for the model to show the mode (15-buttons-mode.js)
           })
           .catch(function (e) {
             if (seq === btnSendSeq) btnMsg = i18nT('buttons.label_error', { label: b.label, error: String(e) });
