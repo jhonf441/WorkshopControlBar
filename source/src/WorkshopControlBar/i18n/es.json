@@ -1,5 +1,8 @@
 {
 	"sidebar": {
+		"hidden_needs_session": "Hay partes que necesitan iniciar sesión",
+		"hidden_needs_role": "Hay partes que necesitan otro rol",
+		"signed_out_login": "Sin sesión · Iniciar sesión",
 		"confirm": "Confirmar",
 		"turn_off_in_timer": "Apagar en... (temporizador)",
 		"schedules_the_power_off_for_when": "Programa el apagado para cuando termine el trabajo actual o, si no hay ninguno, el próximo que se inicie y termine. No es inmediato: para eso está \"Apagar ahora\".",

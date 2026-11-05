@@ -28,6 +28,15 @@
         return v;
       }
 
+      // What the quiet note of the bar says: "" (nothing is hidden), "signed_out" (no session: signing in fixes it) or "role" (only another role does).
+      function sbRoleNoteKind(v, signedOut) {
+        var hidden = Object.keys(SB_ROLE_OPS).some(function (k) {
+          return !v[k];
+        });
+        if (!hidden) return "";
+        return signedOut ? "signed_out" : "role";
+      }
+
       function sbRoleNow() {
         return sbRoleView(typeof workshopCan === "function" ? workshopCan : null);
       }
@@ -59,6 +68,7 @@
         (sb.powerRestartEls || []).forEach(function (e) { sbRoleMark(e, !v.powerRestart); });
         (sb.powerWhenDoneEls || []).forEach(function (e) { sbRoleMark(e, !v.powerWhenDone); });
         (sb.powerTimerEls || []).forEach(function (e) { sbRoleMark(e, !v.powerTimer); });
+        sbRoleNotePaint(v);
         if (typeof ledBox !== "undefined") sbRoleMark(ledBox, !v.led);
         if (typeof ledStripV !== "undefined") sbRoleMark(ledStripV, !v.led);
         // the Hidden style (11-hidden.js): its tiles and its footer
@@ -67,4 +77,39 @@
           sbRoleMark(oc.tShutdown, !v.power);
           sbRoleMark(oc.footer, !v.powerNow);
         }
+      }
+
+      // The quiet line at the end of the bar: something was hidden by the session or the role. Signed out it also offers the sign-in (the bar has no .wf-bar,
+      // so the shared chip does not reach it).
+      function sbRoleNotePaint(v) {
+        var full = sb.full;
+        if (!full) return;
+        var signedOut = typeof workshopSignedOut === "function" && workshopSignedOut();
+        var kind = sbRoleNoteKind(v, signedOut);
+        var box = sb.roleNote;
+        if (!kind) {
+          if (box) box.style.display = "none";
+          return;
+        }
+        if (!box) {
+          box = document.createElement("div");
+          box.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:11px;line-height:1.35;color:rgba(255,255,255,0.55);";
+          sb.roleNoteText = document.createElement("div");
+          sb.roleNoteLogin = document.createElement("button");
+          sb.roleNoteLogin.type = "button";
+          sb.roleNoteLogin.style.cssText = "padding:0;border:0;background:transparent;color:#ffb74d;font:500 11px Roboto,Helvetica,Arial,sans-serif;cursor:pointer;text-align:left;";
+          sb.roleNoteLogin.addEventListener("click", function () {
+            if (typeof workshopLogin === "function") workshopLogin();
+          });
+          box.appendChild(sb.roleNoteText);
+          box.appendChild(sb.roleNoteLogin);
+          sb.roleNote = box;
+        }
+        if (box.parentElement !== full || full.lastElementChild !== box) full.appendChild(box);
+        box.style.display = "flex";
+        var text = i18nT(kind === "signed_out" ? "sidebar.hidden_needs_session" : "sidebar.hidden_needs_role");
+        if (sb.roleNoteText.textContent !== text) sb.roleNoteText.textContent = text;
+        sb.roleNoteLogin.style.display = kind === "signed_out" ? "block" : "none";
+        var login = i18nT("sidebar.signed_out_login");
+        if (sb.roleNoteLogin.textContent !== login) sb.roleNoteLogin.textContent = login;
       }

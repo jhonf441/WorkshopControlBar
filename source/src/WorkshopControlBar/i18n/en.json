@@ -1,5 +1,8 @@
 {
 	"sidebar": {
+		"hidden_needs_session": "Some parts need you to sign in",
+		"hidden_needs_role": "Some parts need another role",
+		"signed_out_login": "No session · Sign in",
 		"confirm": "Confirm",
 		"turn_off_in_timer": "Turn off in... (timer)",
 		"schedules_the_power_off_for_when": "Schedules the power off for when the current job ends or, if there is none, the next one that starts and ends. It's not immediate: that's what \"Power off now\" is for.",

@@ -419,9 +419,15 @@
 
       function sbPlace() {
         if (!sidebarEl) return;
+        // runs every second: it writes only when a number changed (an equal write still invalidates the style of the page; measured on the kiosk)
         var top = sbTopOffset();
+        var bottom = sbBottomNow();
+        var key = top + "|" + bottom + "|" + window.innerHeight + "|" + !!sbHidden.zone + "|" + !!sbHidden.tab;
+        if (sbHidden.placedKey === key && sbHidden.placedEl === sidebarEl) return; // (a new bar element has no variables yet)
+        sbHidden.placedKey = key;
+        sbHidden.placedEl = sidebarEl;
         sidebarEl.style.setProperty("--tp-sb-top", top + "px");
-        sidebarEl.style.setProperty("--tp-sb-bottom", sbBottomNow() + "px");
+        sidebarEl.style.setProperty("--tp-sb-bottom", bottom + "px");
         if (sbHidden.zone) sbHidden.zone.style.top = top + "px";
         if (sbHidden.tab) sbHidden.tab.style.top = Math.round(top + (window.innerHeight - top) / 2) + "px";
         sbHidden.top = top;
@@ -483,6 +489,8 @@
           }
           var sbw = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
           if (sbw > 40) sbw = 0; // odd measure (zoom, without layout): no shift
+          if (sbHidden.sbw === sbw && sbHidden.sbwDone) return; // only when the scroll bar width changed
+          sbHidden.sbwDone = true;
           sbHidden.sbw = sbw;
           z.style.right = sbw + "px";
           t.style.right = sbw + (sbw ? 2 : 0) + "px";

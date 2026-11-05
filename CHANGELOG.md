@@ -1,5 +1,25 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.22 -- 2026-11-04
+
+- Bar placement and the hidden-style tab write styles only when a number changed (they ran every 1-2 s and forced a layout each time)
+
+## 2.7.21 -- 2026-11-04
+
+- Bar placement and the hidden-style tab write styles only when a number changed (they ran every 1-2 s and forced a layout each time)
+
+## 2.7.20 -- 2026-11-04
+
+- Session: no fixed card (AWS style); start-up card off without a session with the reason; service row says sign in
+
+## 2.7.19 -- 2026-11-04
+
+- Signed out: sign-in refusals stay visible and the notice blinks on tab clicks (shared session notice); Power says it needs a sign-in
+
+## 2.7.18 -- 2026-11-04
+
+- Session notice: also mark inline refusals (ctl-alert / alert / -error classes)
+
 ## 2.7.17 -- 2026-11-03
 
 - Session: notice redesigned as a console card, permission messages marked
