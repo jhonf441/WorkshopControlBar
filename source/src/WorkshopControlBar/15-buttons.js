@@ -312,7 +312,8 @@
           })
           .then(function (d) {
             // first time: the factory groups, but ONLY with the buttons whose macro file exists on this SD
-            if (d === null) return btnInitialExisting().then(function (ini) { return { d: ini, migrated: true }; });
+            // nothing found (a clean machine, no macros yet) is NOT saved: an empty buttons.json would stop the seed from ever running again (15-buttons-factory.js)
+            if (d === null) return btnInitialExisting().then(function (ini) { return { d: ini, migrated: ini.groups.length > 0 }; });
             return { d: d, migrated: false };
           })
           .then(function (o) {
@@ -622,12 +623,7 @@
           form._field(i18nT('buttons.g_code_one_or_more_lines'), ta);
         }
 
-        var inColor = btnEl("input", "width:60px;height:30px;padding:0;border:none;background:none;");
-        inColor.type = "color";
-        inColor.value = f.color;
-        inColor.addEventListener("input", function () {
-          f.color = inColor.value;
-        });
+        var inColor = workshopColorEl(f.color, function (v) { f.color = v; }); // the color input of the family (19-help-dom.js)
         form._field(i18nT('buttons.color'), inColor);
 
         var modesRow = btnEl("div", "display:flex;gap:10px;flex-wrap:wrap;font-size:12px;");
@@ -930,7 +926,7 @@
         // What is ON now in this group (at a glance, even
         // folded): the names of the buttons whose state is active.
         var encendidos = g.buttons.filter(function (b) {
-          return btnState(b) === true;
+          return btnShownState(b) === true;
         });
         var conState = g.buttons.some(function (b) {
           return !!b.state;
@@ -992,7 +988,7 @@
             el.appendChild(l1);
             // Disabled: gray, dotted border and the short reason below (before
             // only the opacity went down and it was hard to tell which one worked).
-            var on = btnState(b);
+            var on = btnShownState(b);
             if (on === true) {
               // ENCENDIDO: color lleno, borde blanco grueso, brillo, punto
               // green and "ACTIVO" (even if it cannot be tapped, e.g. the current mode).
@@ -1115,7 +1111,7 @@
           btnRenderGroupForm(fb);
         }
         if (btnMsg && btnMsgGroup === null) sb.btnGroups.appendChild(sbText(btnMsg, "font-size:11px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
-        sb.btnNewGroupBtn.style.display = btnEditing && !btnForm ? "" : "none";
+        sb.btnNewGroupBtn.style.display = btnEditing && !btnForm ? "" : "none"; btnFactoryPaint();
         sbT(sb.btnEditBtn, btnEditing ? i18nT('common.done') : i18nT('common.edit_buttons'));
         sb.btnEditBtn.style.background = btnEditing ? "#2e7d32" : "#37474f";
         sbFeetRender();
@@ -1161,7 +1157,7 @@
         sb.btnNewGroupBtn = sbMakeButton(i18nT('buttons.new_group'), "#1976d2", function () {
           btnNewGroup(null);
         });
-        row.appendChild(sb.btnNewGroupBtn);
+        row.appendChild(sb.btnNewGroupBtn); row.appendChild(sb.btnFactoryBtn = btnFactoryButton()); // 15-buttons-factory.js
         sb.btnEditBtn = sbMakeButton(i18nT('common.edit_buttons'), "#455a64", function () {
           btnEditing = !btnEditing;
           btnForm = null;

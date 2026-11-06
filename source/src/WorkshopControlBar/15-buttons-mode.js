@@ -39,3 +39,12 @@
           if (seq === btnSendSeq) btnMsg = msg;
         });
       }
+
+      // The state a button SHOWS. A function that belongs to another mode (Air off while the machine is in FFF) is not "active" here:
+      // it stays a plain locked button. The mode buttons are the exception: their state IS the machine mode, so they keep "active".
+      function btnShownState(b) {
+        var on = btnState(b);
+        var otherMode = b.modes.length && btnMachineMode && b.modes.indexOf(btnMachineMode) < 0;
+        if (on === true && otherMode && !(b.state && b.state.path === "state.machineMode")) return null;
+        return on;
+      }

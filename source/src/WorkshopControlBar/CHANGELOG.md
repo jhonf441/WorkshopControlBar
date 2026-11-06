@@ -1,5 +1,9 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.28 -- 2026-11-05
+
+- QA batch: factory buttons come back on a clean machine, Air off is not shown wrongly
+
 ## 2.7.27 -- 2026-11-05
 
 - Session state, refusals and notices unified; errors kept as objects; 403 names the action

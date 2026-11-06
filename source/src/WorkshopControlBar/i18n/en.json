@@ -293,7 +293,12 @@
 		"delete_group_with_buttons": "Delete the group WITH its buttons (double tap)",
 		"editing_hint": "Editing: drag by the grip dots to reorder (also between groups).",
 		"current_mode_hint": "Current mode: {mode}. Tap a group title to fold it.",
-		"no_groups_hint": "No groups. Tap \"Edit buttons\" and then \"New group\".",
+		"no_groups_hint": "No groups. Tap \"Add factory buttons\", or \"Edit buttons\" and then \"New group\".",
+		"factory_add": "Add factory buttons",
+		"factory_tip": "Adds the factory buttons (light, air, mode, power supply...) whose macros exist on this machine and are not empty. It does not change what you already have.",
+		"factory_looking": "Looking for the factory macros...",
+		"factory_added": "Added {n} factory buttons.",
+		"factory_none": "Nothing to add: no factory macro exists yet, or its buttons are already there. Create the macros from the Start-up card.",
 		"buttons_caps": "BUTTONS",
 		"buttons_section_help": "Custom macros and G-code, grouped by function. They act on the machine (all screens). Grey ones with a dotted border can't be used now (the reason is shown below).",
 		"label_error": "{label}: error {error}"

@@ -293,7 +293,12 @@
 		"delete_group_with_buttons": "Borrar el grupo CON sus botones (doble toque)",
 		"editing_hint": "Editando: arrastra desde las rayitas para ordenar (también entre grupos).",
 		"current_mode_hint": "Modo actual: {mode}. Toca el título de un grupo para plegarlo.",
-		"no_groups_hint": "No hay grupos. Toca \"Editar botones\" y después \"Nuevo grupo\".",
+		"no_groups_hint": "No hay grupos. Toca \"Agregar botones de fábrica\", o \"Editar botones\" y después \"Nuevo grupo\".",
+		"factory_add": "Agregar botones de fábrica",
+		"factory_tip": "Agrega los botones de fábrica (luz, aire, modo, fuente...) cuyos macros existen en esta máquina y no están vacíos. No cambia lo que ya tienes.",
+		"factory_looking": "Buscando los macros de fábrica...",
+		"factory_added": "Se agregaron {n} botones de fábrica.",
+		"factory_none": "No hay nada que agregar: ningún macro de fábrica existe todavía, o sus botones ya están. Crea los macros desde la tarjeta Puesta en marcha.",
 		"buttons_caps": "BOTONES",
 		"buttons_section_help": "Macros y G-code propios, agrupados por función. Actúan sobre la máquina (todas las pantallas). Los grises con borde punteado no se pueden usar ahora (debajo dice por qué).",
 		"label_error": "{label}: error {error}"
