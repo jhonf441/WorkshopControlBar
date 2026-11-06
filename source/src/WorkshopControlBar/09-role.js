@@ -3,7 +3,7 @@
       // The bar keeps what only it offers (the buttons, the state, the control holder, STOP, shut down when finished and the timer) and
       // lends the rest to its owners: the phone notification settings to Activity (the operator keeps the mute), the mirror of the
       // status LEDs to Lights, the method of shutting down to Power. For an operator those parts are hidden; they stay as a quick access
-      // for technician and admin. Shut down now and Restart everything are the admin's (power.off, power.full_reset).
+      // for technician and admin. Shut down now is everybody's (power.off is a stop operation); Restart everything is the admin's (power.full_reset).
       // Each part is tied to the REAL operation of the table of the service (workshopCan), never to a role name. Without identity
       // (no users, an old service, no answer yet) everything is shown, as before.
 
@@ -12,7 +12,7 @@
         noticeSettings: "notifications.get", // the "Settings..." button of that card: technician (Activity has the settings)
         led: "lights.save", // mirror of the status LEDs: technician (Lights shows the same indicator)
         powerMethod: "power.method", // how it shuts down: technician
-        powerNow: "power.off", // shut down now: admin
+        powerNow: "power.off", // shut down now: everybody
         powerRestart: "power.full_reset", // restart everything: admin
         powerWhenDone: "power.after_job", // shut down when the job finishes: operator
         powerTimer: "power.timer", // shut down in N minutes: operator
@@ -24,6 +24,7 @@
         Object.keys(SB_ROLE_OPS).forEach(function (k) {
           v[k] = typeof can === "function" ? !!can(SB_ROLE_OPS[k]) : true;
         });
+        v.powerNow = true; // shut down now is for everybody (owner decision 2026-11-06: anyone at the machine could pull the plug; the service allows power.off to all)
         v.power = v.powerMethod || v.powerNow || v.powerRestart || v.powerWhenDone || v.powerTimer;
         return v;
       }

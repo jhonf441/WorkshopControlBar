@@ -1,5 +1,21 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.32 -- 2026-11-06
+
+- Side bar and session: the bar follows the session, the real icon with a small lock, the needed role under the name; a page follows a sign-in made in another tab
+
+## 2.7.31 -- 2026-11-06
+
+- Roles: the JS client honors the allow and deny lists of custom roles
+
+## 2.7.30 -- 2026-11-06
+
+- Macros of sys/workshop/macros are now in folders (axis, zcal, focus, work, guard, laser, probe, system); install together with the service and the SD migration
+
+## 2.7.29 -- 2026-11-06
+
+- Roles y permisos: secciones con candado y cubierta que dice el rol, sin modal ni tarjeta de sesion automaticos, apagado total para todos, Puesta en marcha gris por rol
+
 ## 2.7.28 -- 2026-11-05
 
 - QA batch: factory buttons come back on a clean machine, Air off is not shown wrongly

@@ -10,7 +10,7 @@
 ; WorkshopService, shutdown_method.py); without it, the generic text.
 ; 2026-10-13: the order goes through the API (service-call.g, power.off); W0
 ; because the system goes down and cannot answer.
-var en = exists(global.workshopLanguage) ? (global.workshopLanguage == "en") : false   ; messages in English (DWC language, see sys/workshop/macros/language.g)
+var en = exists(global.workshopLanguage) ? (global.workshopLanguage == "en") : false   ; messages in English (DWC language, see sys/workshop/macros/system/language.g)
 var desc = "apaga el sistema YA y corta TODA la energia (sistema + Duet + motores) con el medidor"
 if var.en
     set var.desc = "shuts the system down NOW and cuts ALL the power (system + Duet + motors) with the meter"
@@ -25,6 +25,6 @@ if !var.asked
     set var.ok = (result = 0)
 if var.ok
     M291 P{(var.en ? "Powering off: " : "Apagando: ") ^ var.desc ^ "."} R{var.en ? "Powering off" : "Apagando"} S0 T4
-    M98 P"0:/sys/workshop/macros/service-call.g" S"power.off" W0
+    M98 P"0:/sys/workshop/macros/system/service-call.g" S"power.off" W0
 else
     M291 P{var.en ? "Power off cancelled." : "Apagado cancelado."} R{var.en ? "Cancelled" : "Cancelado"} S1 T3

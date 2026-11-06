@@ -3,7 +3,7 @@
 ; and calls this macro with C1; run from anywhere else (no C1) the question is asked here (M291 S3).
 ; 2026-10-13: the order goes to WorkshopService through its API (service-call.g,
 ; operation power.full_reset).
-var en = exists(global.workshopLanguage) ? (global.workshopLanguage == "en") : false   ; messages in English (DWC language, see sys/workshop/macros/language.g)
+var en = exists(global.workshopLanguage) ? (global.workshopLanguage == "en") : false   ; messages in English (DWC language, see sys/workshop/macros/system/language.g)
 var asked = exists(param.C) && param.C = 1   ; C1 = already confirmed in the floating panel (the bar): do not ask a second time
 var ok = var.asked
 if !var.asked
@@ -15,6 +15,6 @@ if !var.asked
     set var.ok = (result = 0)
 if var.ok
     M291 P{var.en ? "Restarting the board and the system..." : "Reiniciando la placa y el sistema..."} R{var.en ? "Restarting everything" : "Reiniciando todo"} S0 T4
-    M98 P"0:/sys/workshop/macros/service-call.g" S"power.full_reset" W0
+    M98 P"0:/sys/workshop/macros/system/service-call.g" S"power.full_reset" W0
 else
     M291 P{var.en ? "Restart cancelled." : "Reinicio cancelado."} R{var.en ? "Cancelled" : "Cancelado"} S1 T3

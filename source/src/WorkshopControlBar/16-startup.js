@@ -88,7 +88,7 @@
               l.push("; The system service switches the work light, keeps its state (the button of the bar shows it) and paints the strip");
               l.push("; (" + (workshopPluginActive("lights") ? "Lights page; " : "") + "the strip has to be set up first: M950 E.. in your config.g). It runs 0:/macros/light/lighton.g and lightoff.g,");
               l.push("; which only set the colour of the work light (global.lightZoneColor).");
-              l.push('M98 P"0:/sys/workshop/macros/service-call.g" S"light.set" A"on=' + (turn_on ? "true" : "false") + '" Q1');
+              l.push('M98 P"0:/sys/workshop/macros/system/service-call.g" S"light.set" A"on=' + (turn_on ? "true" : "false") + '" Q1');
             } else if (r.method === "strip") {
               l.push("; The strip has to be set up first (M950 E.. in your config.g): M150 only paints it.");
               if (turn_on) l.push("M150 R255 G255 B255 W" + (r.white ? "255" : "0") + " S" + r.leds);

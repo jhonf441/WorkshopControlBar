@@ -4,8 +4,8 @@
 ; 2026-10-13: WorkshopService does it (API operation power.after_job through
 ; service-call.g), so this macro and the pages always show the same state.
 
-var en = exists(global.workshopLanguage) ? (global.workshopLanguage == "en") : false   ; messages in English (DWC language, see sys/workshop/macros/language.g)
-M98 P"0:/sys/workshop/macros/service-call.g" S"power.after_job" A"armed=toggle" Q1
+var en = exists(global.workshopLanguage) ? (global.workshopLanguage == "en") : false   ; messages in English (DWC language, see sys/workshop/macros/system/language.g)
+M98 P"0:/sys/workshop/macros/system/service-call.g" S"power.after_job" A"armed=toggle" Q1
 
 if exists(global.powerOffOnFinish) && global.powerOffOnFinish
     ; one M291 per language: a line with an argument of 255 characters or more is not accepted by RRF
