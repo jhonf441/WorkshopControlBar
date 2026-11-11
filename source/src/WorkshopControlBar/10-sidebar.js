@@ -727,7 +727,7 @@
           if (!ui) {
             var toggle = function () {
               var cur = workshop.panels[id];
-              if (cur) cur.toggle();
+              if (cur) sbOpenTap(cur); // 09-panel-open.js: a panel locked by the session or the role signs in instead of opening
             };
             ui = sbPanelUi[id] = {};
             ui.rail = sbMakeRailBtn(p.icon, p.title, null, toggle);

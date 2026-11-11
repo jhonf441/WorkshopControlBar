@@ -388,7 +388,16 @@
       }
 
       // Reason why the button can NOT be used now ("" = it can).
+      // true only when the list of macros of the SD was read (not empty: a failed read leaves it empty) and the macro of this button is not in it.
+      // A button that was saved while its macro existed must not look usable after the macro is gone (SD-LAYOUT.md B.3 row 5).
+      function btnMacroMissing(b) {
+        if (!b || b.kind !== "macro" || !b.action || !btnMacroList || !btnMacroList.length) return false;
+        return btnMacroList.indexOf(String(b.action).replace(/^\/+/, "")) < 0;
+      }
+
       function btnBlockReason(b) {
+        var modeReason = btnModeBlockReason(b); // a mode button follows the one rule of every mode switch (15-buttons-mode.js)
+        if (modeReason) return modeReason;
         if (b.modes.length && btnMachineMode && b.modes.indexOf(btnMachineMode) < 0)
           return i18nT('buttons.only_in_mode_now', { modes: b.modes.join(" / "), mode: btnMachineMode });
         if (!b.inJob && btnJobRunning()) return i18nT('buttons.not_available_with_a_job_running');
@@ -404,6 +413,7 @@
             return ml.reason;
         }
         if (!b.action) return i18nT('buttons.no_action_configured');
+        if (btnMacroMissing(b)) return i18nT('buttons.macro_missing', { macro: b.action });
         return "";
       }
 
@@ -753,6 +763,7 @@
         if (b.modes.length && btnMachineMode && b.modes.indexOf(btnMachineMode) < 0) return i18nT('buttons.only_modes_short', { modes: b.modes.join("/") });
         if (!b.inJob && btnJobRunning()) return i18nT('buttons.not_with_a_job');
         if (!b.action) return i18nT('buttons.no_action');
+        if (btnMacroMissing(b)) return i18nT('buttons.macro_missing_short');
         return "";
       }
 

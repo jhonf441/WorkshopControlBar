@@ -2,7 +2,7 @@
   "id": "WorkshopControlBar",
   "name": "Control Bar",
   "author": "jhonf441",
-  "version": "2.7.33",
+  "version": "2.7.37",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/jhonf441/WorkshopControlBar",
   "tags": [
@@ -17,20 +17,31 @@
   "sbcDsfVersion": "3.6",
   "data": {},
   "sdFiles": [
+    "sys/workshop/examples/WorkshopControlBar/macros/cnc/capturezero.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/cnc/setzero.g",
     "sys/workshop/examples/WorkshopControlBar/macros/laser/air_off_sync.g",
     "sys/workshop/examples/WorkshopControlBar/macros/laser/air_on_sync.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/laser/airoff.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/laser/airon.g",
     "sys/workshop/examples/WorkshopControlBar/macros/light/light_off_sync.g",
     "sys/workshop/examples/WorkshopControlBar/macros/light/light_on_sync.g",
     "sys/workshop/examples/WorkshopControlBar/macros/light/lightoff.g",
     "sys/workshop/examples/WorkshopControlBar/macros/light/lighton.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/statusledoff.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/statusledon.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/statuslight_off.g",
+    "sys/workshop/examples/WorkshopControlBar/macros/light/statuslight_on.g",
     "sys/workshop/examples/WorkshopControlBar/macros/power/full-reset.g",
     "sys/workshop/examples/WorkshopControlBar/macros/power/shutdown-after-job.g",
     "sys/workshop/examples/WorkshopControlBar/macros/power/shutdown-all.g",
     "sys/workshop/examples/WorkshopControlBar/macros/psu/start.g",
     "sys/workshop/examples/WorkshopControlBar/macros/psu/stop.g"
   ],
+  "dsfFiles": [
+    "permissions.json"
+  ],
   "dwcFiles": [
-    "js/WorkshopControlBar.02c85b91.js",
-    "js/WorkshopControlBar.02c85b91.js.gz"
+    "js/WorkshopControlBar.dab85d3d.js",
+    "js/WorkshopControlBar.dab85d3d.js.gz"
   ]
 }

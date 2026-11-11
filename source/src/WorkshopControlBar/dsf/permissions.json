@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "plugin": "WorkshopControlBar",
+  "namespace": "controlbar",
+  "prefixes": [],
+  "ui": "ui:controlbar:open",
+  "operations": [
+    "lights.save",
+    "livejob.stop_safe",
+    "notifications.get",
+    "notifications.mute",
+    "power.after_job",
+    "power.full_reset",
+    "power.method",
+    "power.off",
+    "power.timer",
+    "power.timer_cancel"
+  ],
+  "shared": [
+    "lights.save",
+    "livejob.stop_safe",
+    "notifications.get",
+    "notifications.mute",
+    "power.after_job",
+    "power.full_reset",
+    "power.method",
+    "power.off",
+    "power.timer",
+    "power.timer_cancel"
+  ],
+  "restricted": [
+    "power.full_reset"
+  ],
+  "targets": [
+    "power:timer"
+  ],
+  "profiles": {
+    "readonly": {
+      "title": "ControlBarReadOnly",
+      "capabilities": [
+        "machine.stop"
+      ]
+    },
+    "operator": {
+      "title": "ControlBarOperator",
+      "capabilities": [
+        "activity.write",
+        "energy.timers",
+        "machine.stop"
+      ]
+    },
+    "admin": {
+      "title": "ControlBarAdmin",
+      "capabilities": [
+        "activity.settings",
+        "activity.write",
+        "energy.meter",
+        "energy.shutdown",
+        "energy.timers",
+        "lights.config",
+        "machine.stop"
+      ]
+    }
+  }
+}

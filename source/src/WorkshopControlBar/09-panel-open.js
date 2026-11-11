@@ -16,12 +16,48 @@
       var SB_OPEN_STYLE_ID = "workshop-bar-open-css"; // listed in BAR_OWN_STYLES (20-main.js): it leaves the page when the plugin stops
 
       // What a panel's state() answered, as the painters read it. A closing panel (busy, not open any more) is still on the screen, so it keeps
-      // the open look until it is gone; `kind` is the word the badge says: open, busy (the panel's own text) or closed.
+      // the open look until it is gone; `kind` is the word the badge says: open, busy (the panel's own text), locked or closed.
+      // `locked` (owner rule 2026-11-06): a panel that cannot be OPENED by this person because it needs a session ({ kind: "session" }) or a role
+      // ({ kind: "role", needed: "<role id>" }) is not opened: its launchers show a lock and the reason, and the tap signs in (or changes the
+      // person) instead of opening. A panel that is already open is not locked by this (the panel itself blocks its content in place).
       function sbOpenView(st) {
         var s = st && typeof st === "object" ? st : {};
         var open = !!s.open;
         var busy = !open && !!s.busy;
-        return { open: open, busy: busy, on: open || busy, disabled: !!s.disabled, kind: open ? "open" : busy ? "busy" : "closed" };
+        var lk = !open && !busy && s.locked && typeof s.locked === "object" && (s.locked.kind === "session" || s.locked.kind === "role") ? { kind: s.locked.kind, needed: s.locked.needed || "" } : null;
+        return { open: open, busy: busy, on: open || busy, disabled: !!s.disabled && !lk, locked: lk, kind: open ? "open" : busy ? "busy" : lk ? "locked" : "closed" };
+      }
+
+      // The reason of a locked panel in the words of the session standard (one sentence per cause, _shared/09-notice-dom.js), and the word of its
+      // action: sign in while nobody is, change the person when the role is too low (the same name + PIN dialog serves both).
+      function sbOpenLockText(lk) {
+        return typeof workshopNoticeText === "function" ? workshopNoticeText(lk.kind, lk.needed || undefined) : "";
+      }
+      function sbOpenLockAction(lk) {
+        return i18nT(lk.kind === "session" ? "sidebar.panel_locked_sign_in" : "sidebar.panel_locked_change_role");
+      }
+      // The tap on a locked launcher: the name + PIN dialog (a sign-in, or another person). Nothing opens.
+      function sbOpenLockTap() {
+        if (typeof workshopLogin === "function") workshopLogin();
+      }
+      // What a launcher does when tapped: the lock dialog for a locked panel, else the panel's own toggle. Returns true when it was the lock.
+      function sbOpenTap(p) {
+        var st = {};
+        try {
+          st = (p && typeof p.state === "function" && p.state()) || {};
+        } catch (e) {
+          st = {};
+        }
+        if (sbOpenView(st).locked) {
+          sbOpenLockTap();
+          return true;
+        }
+        if (p && typeof p.toggle === "function") p.toggle();
+        return false;
+      }
+      // The color of the lock mark and of the reason: the token of the cause (blue for the session, gray for the role)
+      function sbOpenLockColor(lk) {
+        return lk.kind === "session" ? "var(--wf-n-session-text,#90caf9)" : "var(--wf-n-role-text,#b0bec5)";
       }
 
       // The CSS the painters need and inline styles cannot say: the pulse and the reduced-motion rule. The dot is a class (.sb-open-dot), the

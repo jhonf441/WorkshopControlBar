@@ -182,7 +182,9 @@
           view: "modal",
           onChange: function (res) {
             if (!barStartupBand) return;
-            barStartupBand.box.style.display = res.ready ? "none" : "flex";
+            // the strip only while there is something to set up; rows that could not be checked (no session) are not steps, and the note of the
+            // bar already says "sign in"
+            barStartupBand.box.style.display = res.pending ? "flex" : "none";
             barStartupBand.text.textContent = i18nT("startup_bar.strip_text", { n: res.pending });
           },
         });

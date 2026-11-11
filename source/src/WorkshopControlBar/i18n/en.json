@@ -1,7 +1,7 @@
 {
 	"sidebar": {
-		"hidden_needs_session": "Some parts are hidden until you sign in.",
-		"hidden_needs_role": "Some parts are hidden because they require another role. Your role: {role}. Ask an administrator for access.",
+		"locked_needs_session": "The dimmed parts need you to sign in.",
+		"locked_needs_role": "The dimmed parts require another role. Your role: {role}. Ask an administrator for access.",
 		"signed_out_login": "No session · Sign in",
 		"confirm": "Confirm",
 		"turn_off_in_timer": "Turn off in... (timer)",
@@ -66,6 +66,9 @@
 		"panel_this_screen_only_open": "{name} (this screen only): open -- tap to close",
 		"panel_this_screen_only_tap_to_open": "{name} (this screen only): tap to open",
 		"panel_busy": "Working",
+		"panel_locked_sign_in": "Sign in",
+		"panel_locked_change_role": "Change role",
+		"panel_locked_tip": "{name}: {reason} Tap: {action}.",
 		"version": "Control Bar {version}",
 		"shut_down_when_done_reading": "Shut down when done: reading state...",
 		"shut_down_when_done": "Shut down when done",
@@ -276,6 +279,8 @@
 		"only_modes_short": "only {modes}",
 		"not_with_a_job": "not during a job",
 		"no_action": "no action",
+		"macro_missing": "Macro not found on the SD: {macro}",
+		"macro_missing_short": "no macro",
 		"show_the_buttons_of": "Show the buttons of {name}",
 		"fold_this_screen_only": "Fold {name} (this screen only)",
 		"confirm_q": "Confirm?",

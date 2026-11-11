@@ -299,7 +299,7 @@
             if (!t) {
               t = oc.panelTiles[id] = ocTile(function () {
                 var cur = workshop.panels[id];
-                if (cur) cur.toggle();
+                if (cur) sbOpenTap(cur); // 09-panel-open.js: a locked panel signs in instead of opening
                 setTimeout(sidebarRefresh, 50);
               });
               sbH(t._ic, sbIconSvg(p.icon, 18, false));

@@ -1,7 +1,7 @@
 {
 	"sidebar": {
-		"hidden_needs_session": "Hay partes ocultas que requieren iniciar sesión.",
-		"hidden_needs_role": "Hay partes ocultas que requieren otro rol. Tu rol: {role}. Pide el acceso a un administrador.",
+		"locked_needs_session": "Las partes atenuadas requieren iniciar sesión.",
+		"locked_needs_role": "Las partes atenuadas requieren otro rol. Tu rol: {role}. Pide el acceso a un administrador.",
 		"signed_out_login": "Sin sesión · Iniciar sesión",
 		"confirm": "Confirmar",
 		"turn_off_in_timer": "Apagar en... (temporizador)",
@@ -66,6 +66,9 @@
 		"panel_this_screen_only_open": "{name} (solo esta pantalla): abierto -- tocar para cerrar",
 		"panel_this_screen_only_tap_to_open": "{name} (solo esta pantalla): tocar para abrir",
 		"panel_busy": "Trabajando",
+		"panel_locked_sign_in": "Iniciar sesión",
+		"panel_locked_change_role": "Cambiar rol",
+		"panel_locked_tip": "{name}: {reason} Tocar: {action}.",
 		"version": "Barra de control {version}",
 		"shut_down_when_done_reading": "Apagar al terminar: leyendo estado...",
 		"shut_down_when_done": "Apagar al terminar",
@@ -276,6 +279,8 @@
 		"only_modes_short": "solo {modes}",
 		"not_with_a_job": "no con trabajo",
 		"no_action": "sin acción",
+		"macro_missing": "La macro no existe en la SD: {macro}",
+		"macro_missing_short": "sin macro",
 		"show_the_buttons_of": "Mostrar los botones de {name}",
 		"fold_this_screen_only": "Plegar {name} (solo en esta pantalla)",
 		"confirm_q": "Confirmar?",

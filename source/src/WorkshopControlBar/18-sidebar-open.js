@@ -47,6 +47,16 @@
         ui.railDot.setAttribute("aria-hidden", "true");
         ui.railDot.style.cssText = "position:absolute;top:3px;right:3px;width:10px;height:10px;display:none;pointer-events:none;box-shadow:0 0 0 2px " + SB_OPEN_FILL + ";";
         ui.rail.appendChild(ui.railDot);
+        // the lock of a panel this person cannot open (a session or a role): a small mark in the corner, in the color of the cause
+        ui.railLock = document.createElement("span");
+        ui.railLock.setAttribute("aria-hidden", "true");
+        ui.railLock.style.cssText = "position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;pointer-events:none;background:#1e272c;";
+        ui.rail.appendChild(ui.railLock); // its glyph is drawn only while locked: an unlocked launcher carries exactly one icon
+      }
+
+      // The lock mark (a closed padlock), drawn like every other icon of the bar: an SVG, never a glyph the kiosk font lacks
+      function sbOpenLockSvg(px) {
+        return '<svg viewBox="0 0 24 24" width="' + px + '" height="' + px + '" fill="currentColor" aria-hidden="true" style="display:block"><path d="M12 17a2 2 0 0 0 2-2c0-1.11-.9-2-2-2a2 2 0 0 0-2 2 2 2 0 0 0 2 2m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10c0-1.11.9-2 2-2h1V6a5 5 0 0 1 5-5 5 5 0 0 1 5 5v2h1m-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3z"/></svg>';
       }
 
       // The pieces of both launchers that the painters keep, built once when sbSyncPanels makes them: the rail icon with its dot, the status
@@ -58,15 +68,27 @@
         ui.btn.style.minHeight = SB_OPEN_TOUCH + "px";
       }
 
-      // Rail icon: closed = quiet gray; open = accent fill + ring + the dot (not only another tone)
+      // The tooltip of a launcher: the panel's own, or the words of its state; a locked panel says its reason and what the tap does
+      function sbOpenHint(p, st, v) {
+        if (v.locked) return i18nT("sidebar.panel_locked_tip", { name: p.title, reason: sbOpenLockText(v.locked), action: sbOpenLockAction(v.locked) });
+        return st.railTitle || i18nT(v.open ? "sidebar.panel_this_screen_only_open" : "sidebar.panel_this_screen_only_tap_to_open", { name: p.title });
+      }
+
+      // Rail icon: closed = quiet gray; open = accent fill + ring + the dot (not only another tone); locked = the quiet icon with a lock mark
       function sbOpenPaintRail(ui, p, st, v) {
         sbH(ui.railIcon, sbIconSvg(p.icon, 22, false));
         ui.rail.dataset.sbOpen = v.on ? "1" : "0";
+        ui.rail.dataset.sbLocked = v.locked ? v.locked.kind : "";
         ui.rail.style.background = v.on ? SB_OPEN_FILL : "#37474f";
         ui.rail.style.border = v.on ? "2px solid " + SB_OPEN_RING : "1px solid rgba(255,255,255,0.25)";
-        ui.rail.style.opacity = st.disabled ? "0.4" : "1";
+        ui.rail.style.opacity = v.disabled ? "0.4" : v.locked ? "0.85" : "1";
         ui.railDot.style.display = v.on ? "" : "none";
-        var hint = st.railTitle || i18nT(v.open ? "sidebar.panel_this_screen_only_open" : "sidebar.panel_this_screen_only_tap_to_open", { name: p.title });
+        if (ui.railLock) {
+          sbH(ui.railLock, v.locked ? sbOpenLockSvg(11) : "");
+          ui.railLock.style.display = v.locked ? "flex" : "none";
+          ui.railLock.style.color = v.locked ? sbOpenLockColor(v.locked) : "";
+        }
+        var hint = sbOpenHint(p, st, v);
         ui.rail.title = hint;
         ui.rail.setAttribute("aria-label", hint);
         ui.rail.setAttribute("aria-pressed", v.open ? "true" : "false");
@@ -80,24 +102,28 @@
         if (v.on) ui.card.style.setProperty("background", SB_OPEN_FILL, "important");
         else ui.card.style.setProperty("background", "rgba(0,0,0,0.25)");
         ui.card.style.border = v.on ? "2px solid " + SB_OPEN_RING : "";
-        sbOpenBadge(ui.status, v.on, st.statusText || (v.open ? "" : i18nT("sidebar.closed")));
-        ui.status.style.color = v.on ? SB_OPEN_TEXT : "rgba(255,255,255,0.6)";
-        ui.status.style.fontWeight = v.on ? "700" : "bold";
+        // locked: the status line is the reason (in the color of its cause) and the button is the way out of the lock, never "Open"
+        sbOpenBadge(ui.status, v.on, v.locked ? sbOpenLockText(v.locked) : st.statusText || (v.open ? "" : i18nT("sidebar.closed")));
+        ui.status.style.color = v.on ? SB_OPEN_TEXT : v.locked ? sbOpenLockColor(v.locked) : "rgba(255,255,255,0.6)";
+        ui.status.style.fontWeight = v.on ? "700" : v.locked ? "500" : "bold";
+        ui.status.style.whiteSpace = v.locked ? "normal" : "";
+        ui.card.dataset.sbLocked = v.locked ? v.locked.kind : "";
         if (ui.desc) ui.desc.style.color = v.on ? SB_OPEN_TEXT : "rgba(255,255,255,0.7)";
         // Open: one small X (40 px target) with its accessible name and tooltip; closed: the "Open {name}" button as ever
-        var label = v.open ? i18nT("sidebar.close_name", { name: name }) : i18nT("sidebar.open_name", { name: name });
+        var label = v.open ? i18nT("sidebar.close_name", { name: name }) : v.locked ? sbOpenLockAction(v.locked) : i18nT("sidebar.open_name", { name: name });
         if (v.open) sbH(ui.btn, sbIconSvg("close", 18, false));
+        else if (v.locked) sbH(ui.btn, '<span style="display:inline-flex;align-items:center;gap:6px;pointer-events:none">' + sbOpenLockSvg(14) + "<span>" + label + "</span></span>");
         else sbT(ui.btn, label);
         ui.btn.style.flex = v.open ? "0 0 auto" : "1 1 auto";
         ui.btn.style.minWidth = v.open ? SB_OPEN_TOUCH + "px" : "";
         ui.btn.style.marginLeft = v.open ? "auto" : "";
-        ui.btn.title = label;
-        ui.btn.setAttribute("aria-label", label);
-        ui.btn.style.background = v.on ? SB_OPEN_BTN : SB_OPEN_FILL;
+        ui.btn.title = v.locked ? sbOpenHint(p, st, v) : label;
+        ui.btn.setAttribute("aria-label", ui.btn.title);
+        ui.btn.style.background = v.on ? SB_OPEN_BTN : v.locked && v.locked.kind === "role" ? "#455a64" : SB_OPEN_FILL;
         ui.btn.style.color = v.on ? SB_OPEN_BTN_TEXT : SB_OPEN_TEXT;
         ui.btn.setAttribute("aria-pressed", v.open ? "true" : "false");
-        ui.btn.disabled = !!st.disabled;
-        ui.btn.style.opacity = st.disabled ? "0.5" : "1";
+        ui.btn.disabled = v.disabled;
+        ui.btn.style.opacity = v.disabled ? "0.5" : "1";
       }
 
       // Both launchers of one registered panel, from the state it gave
