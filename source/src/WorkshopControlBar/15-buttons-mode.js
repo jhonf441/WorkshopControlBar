@@ -56,3 +56,38 @@
         if (on === true && otherMode && !(b.state && b.state.path === "state.machineMode")) return null;
         return on;
       }
+
+      // ---- The profile in the bar (UNUSED case of the mode rule, vue/_shared36/mode-gate.js): a mode the machine profile says it does not use ----
+      // The groups and buttons of that mode are NOT shown (a decision of the configuration, it never flickers with the mode the machine is in).
+      // Only when the profile is ANSWERED: an unanswered or unread profile hides nothing. While the buttons are edited everything shows.
+      var btnModesState = null; // workshopModes.load().state: { answer: { FFF, Laser, CNC }, answered }
+      var btnModesKey = "";
+
+      // true when the profile is answered and says the machine does not use `mode`
+      function btnModeUnused(mode) {
+        return !!(btnModesState && btnModesState.answered && btnModesState.answer && BUTTONS_MODES.indexOf(mode) >= 0 && !btnModesState.answer[mode]);
+      }
+
+      // a button belongs to unused modes only: the mode button of an unused mode, or one that works only in unused modes (Air in Laser)
+      function btnButtonUnused(b) {
+        var target = btnModeTarget(b);
+        if (target) return btnModeUnused(target);
+        return !!(b && b.modes && b.modes.length) && b.modes.every(btnModeUnused);
+      }
+
+      // a group with buttons, all of them unused
+      function btnGroupUnused(g) {
+        return !!(g && g.buttons && g.buttons.length) && g.buttons.every(btnButtonUnused);
+      }
+
+      // reads the profile (cached by the shared profile reader); draws again only when the answer changed
+      function btnLoadModes() {
+        if (typeof workshopModes === "undefined") return Promise.resolve();
+        return workshopModes.load().then(function (o) {
+          var key = JSON.stringify(o.state);
+          if (key === btnModesKey) return;
+          btnModesKey = key;
+          btnModesState = o.state;
+          if (typeof btnRender === "function") btnRender();
+        }).catch(function () { /* unknown profile: nothing is hidden */ });
+      }

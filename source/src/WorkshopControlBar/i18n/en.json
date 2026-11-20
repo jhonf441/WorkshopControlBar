@@ -1,4 +1,12 @@
 {
+	"subjects_controlbar": {
+		"notice": "Phone notice",
+		"method": "Start method",
+		"restart": "Restart",
+		"when_done": "When done",
+		"timer": "Timer",
+		"control_bar": "Control bar"
+	},
 	"sidebar": {
 		"locked_needs_session": "The dimmed parts need you to sign in.",
 		"locked_needs_role": "The dimmed parts require another role. Your role: {role}. Ask an administrator for access.",
@@ -276,7 +284,7 @@
 		"choose_a_macro": "Choose a macro",
 		"the_g_code_is_missing": "G-code is missing",
 		"tick_at_least_one_mode": "Check at least one mode",
-		"only_modes_short": "only {modes}",
+		"only_modes_short": "Only in {modes} mode",
 		"not_with_a_job": "not during a job",
 		"no_action": "no action",
 		"macro_missing": "Macro not found on the SD: {macro}",

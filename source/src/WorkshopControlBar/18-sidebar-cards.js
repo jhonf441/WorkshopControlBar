@@ -172,6 +172,7 @@
         notifCard.appendChild(sb.noticeMsg);
         sb.noticeHelp = sbText("");
         notifCard.appendChild(sb.noticeHelp);
+        notifCard.appendChild(sbReasonEl("notice")); // 09-access-reasons.js: why the mute / the settings link are refused, when the service says so
         sbRefreshNoticeLinks();
       }
 
@@ -248,6 +249,7 @@
         powerCard.appendChild(sb.methodHelp);
         sb.methodMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.methodMsg);
+        powerCard.appendChild(sbReasonEl("method"));
         sb.powerMethodEls = [sb.methodTitle, sb.methodRow, sb.methodPi, sb.relayRow, sb.methodDesc, sb.methodNotice, sb.methodHelp, sb.methodMsg]; // role: technician (09-role.js)
       }
 
@@ -274,6 +276,7 @@
         resetRow.appendChild(resetBtn);
         var resetHelp = sbText(i18nT('sidebar.restart_everything_help'));
         powerCard.appendChild(resetHelp);
+        powerCard.appendChild(sbReasonEl("restart")); // Shut down now (power.off) is a stop: no note, no ask
         sb.powerNowEls = [sep0, nowRow, sb.nowText]; // role: admin (09-role.js)
         sb.powerRestartEls = [resetRow, resetHelp];
       }
@@ -296,6 +299,7 @@
         powerCard.appendChild(sb.shutdownMethodLn);
         sb.shutdownMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.shutdownMsg);
+        powerCard.appendChild(sbReasonEl("when_done"));
         sb.powerWhenDoneEls = [sep, sb.shutdownStatus, endRow, sb.shutdownContext, sb.shutdownMethodLn, sb.shutdownMsg]; // role: operator
       }
 
@@ -352,6 +356,7 @@
         powerCard.appendChild(sb.timingText);
         sb.timingMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
         powerCard.appendChild(sb.timingMethodLn);
+        powerCard.appendChild(sbReasonEl("timer"));
         sb.powerTimerEls = [sep2, sb.timingStatus, sb.timingRow, tempoRow2, sb.timingMsg, sb.timingText, sb.timingMethodLn]; // role: operator
       }
 

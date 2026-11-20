@@ -13,8 +13,12 @@
         if (status) workshopPublishStatus(status);
       }
 
-      var barStatusOff = workshopOnModel(function (status) {
-        if (!pluginStopped && Date.now() - workshop.lastStatusAt > BAR_STATUS_STALE_MS) workshopPublishStatus(status);
+      // 2026-11-13: it listens on the LIVE model and copies the whole model (workshopStateDwc) only when nobody published lately; with the
+      // jog running (the usual case) the bar no longer makes a JSON copy of the model at every update just to throw it away.
+      var barStatusOff = workshopOnModelLive(function () {
+        if (pluginStopped || Date.now() - workshop.lastStatusAt <= BAR_STATUS_STALE_MS) return;
+        var status = workshopStateDwc();
+        if (status) workshopPublishStatus(status);
       }, BAR_STATUS_POLL_MS);
 
       workshopOnChange(sidebarRefresh);

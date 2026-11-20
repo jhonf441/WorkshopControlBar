@@ -56,13 +56,9 @@
       }
 
       // ---- State of the FUNCTION (on / off) ----
-      // Request 2026-10-08: "active = if the button's function is active"
-      // (light on, air on, current mode, supply on). Each
-      // button can have `estado: {ruta, valor}`: that path of the
-      // object model (/machine/status) is looked at and if it equals `valor` the button looks
-      // ON (white border, green dot, "ACTIVE"). This way a
-      // Light ON / Light OFF pair works like a switch: the one that
-      // corresponds to the real state lights up.
+      // Request 2026-10-08: "active = if the button's function is active" (light on, air on, current mode, supply on). A button can have
+      // `estado: {ruta, valor}`: that path of the object model (/machine/status) is looked at and if it equals `valor` the button looks ON
+      // (white border, green dot, "ACTIVE"), so a Light ON / Light OFF pair works like a switch.
       var PCC = "plugins.WorkshopService.data.";
       var BTN_STATES = {
         lightOn: { label: i18nT('buttons.light_on'), path: PCC + "lightOn", value: true },
@@ -332,6 +328,7 @@
           })
           .then(function (r) {
             if (force || r !== "same") btnRender();
+            if (typeof btnLoadModes === "function") btnLoadModes(); // the profile (15-buttons-mode.js) hides the groups of the modes the machine does not use
           });
       }
 
@@ -768,12 +765,9 @@
       }
 
       // ---- Drag to order (edit mode) ----
-      // Request 2026-10-08: "drag in the sidebar to organize".
-      // Each button row and each group header has a HANDLE (the little
-      // stripes on the left): it is dragged from there (the rest of the
-      // bar keeps scrolling with the finger). A button can be dropped
-      // in another place of its group or in ANOTHER group; a group, between groups.
-      // Near the top/bottom edge the bar scrolls by itself.
+      // Request 2026-10-08: "drag in the sidebar to organize". Each button row and each group header has a HANDLE (the little stripes on
+      // the left): it is dragged from there (the rest of the bar keeps scrolling with the finger). A button can be dropped in another place of
+      // its group or in ANOTHER group; a group, between groups. Near the top/bottom edge the bar scrolls by itself.
       var BTN_DRAG_HANDLE_SVG =
         '<path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>';
       var btnDrag = null;
@@ -979,7 +973,7 @@
 
         var grid = btnEl("div", "display:flex;flex-wrap:wrap;gap:6px;");
         card.appendChild(grid);
-        g.buttons.forEach(function (b, i) {
+        g.buttons.forEach(function (b, i) { if (!btnEditing && btnButtonUnused(b)) return; // unused mode (15-buttons-mode.js): the button is not shown
           if (!btnEditing) {
             var reason = btnBlockReason(b);
             var armed = btnArmed === "run:" + gi + ":" + i;
@@ -1003,11 +997,11 @@
             if (on === true) {
               // ENCENDIDO: color lleno, borde blanco grueso, brillo, punto
               // green and "ACTIVO" (even if it cannot be tapped, e.g. the current mode).
-              el.disabled = !!reason;
+              el.disabled = true; // 2026-11-18: a function already in this state is not asked again (light off while off re-sent the macro)
               el.style.position = "relative";
               el.style.border = "2px solid #fff";
               el.style.boxShadow = "0 0 10px " + bColor;
-              el.style.cursor = reason ? "default" : "pointer";
+              el.style.cursor = "default";
               el.appendChild(btnEl("span", "font-size:10px;font-weight:bold;letter-spacing:0.08em;", i18nT('buttons.active_caps')));
               el.appendChild(btnEl("span", "position:absolute;top:3px;right:4px;width:8px;height:8px;border-radius:50%;background:#69f0ae;box-shadow:0 0 4px #69f0ae;"));
               // Mirror of the status LEDs (20-led-mirror.js): the button takes the
@@ -1021,7 +1015,7 @@
               el.style.border = "1px dashed rgba(255,255,255,0.3)";
               el.style.cursor = "not-allowed";
               el.style.fontWeight = "normal";
-              var l2 = btnEl("span", "font-size:10px;font-weight:normal;letter-spacing:0.02em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", btnShortReason(b));
+              var l2 = btnEl("span", "font-size:11px;font-weight:normal;color:rgba(255,255,255,0.78);letter-spacing:0.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", btnShortReason(b));
               el.appendChild(l2);
             } else {
               el.style.border = "1px solid rgba(255,255,255,0.55)";
@@ -1110,7 +1104,7 @@
         Array.prototype.forEach.call(btnZone().querySelectorAll("[data-btn-group], [data-btn-form-sec]"), function (el) {
           el.remove();
         });
-        btnData.groups.forEach(btnRenderGroup);
+        btnData.groups.forEach(function (g, gi) { if (btnEditing || !btnGroupUnused(g)) btnRenderGroup(g, gi); }); // a group of an unused mode is not shown
         if (!btnData.groups.length) sb.btnGroups.appendChild(sbText(i18nT('buttons.no_groups_hint')));
         if (btnEditing && btnForm && btnForm.kind === "group" && btnForm.g < 0) {
           var fb = btnEl("div");

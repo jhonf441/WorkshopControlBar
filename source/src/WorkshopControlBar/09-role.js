@@ -85,7 +85,8 @@
         // the reason of each part: the sentence of every notice (09-notice-dom.js), by the state of the session or the role the part needs
         var why = function (part) {
           if (typeof workshopNoticeText !== "function") return undefined;
-          return signedOut ? workshopNoticeText("session") : workshopNoticeText("role", sbRoleNeed(SB_ROLE_OPS[part]));
+          if (signedOut) return workshopNoticeText("session");
+          return sbReasonSentence(SB_ROLE_OPS[part]) || workshopNoticeText("role", sbRoleNeed(SB_ROLE_OPS[part])); // the answer of the service first (09-access-reasons.js), the role as fallback
         };
         [sb.notificationCard, sb.railNotice].forEach(function (e) { sbRoleMark(e, !v.notice, why("notice")); });
         sbRoleMark(sb.noticeSettingsBtn, !v.noticeSettings, why("noticeSettings"));
@@ -124,10 +125,10 @@
         if (!box || sb.roleNoteKey !== key) {
           if (box && box.parentElement) box.parentElement.removeChild(box);
           var text = kind === "signed_out" ? workshopSessionSentence("sidebar.locked_needs_session") : i18nT("sidebar.locked_needs_role", { role: workshopNoticeRoleName(typeof workshopRole === "function" ? workshopRole() : "") });
-          box = workshopNoticeEl(kind === "signed_out" ? "session" : "role", "section", { text: text, action: kind === "signed_out" ? "sign-in" : "" });
+          box = workshopNoticeEl(kind === "signed_out" ? "session" : "role", "section", { text: text, action: kind === "signed_out" ? "sign-in" : "", subject: i18nT("subjects_controlbar.control_bar") });
           sb.roleNote = box;
           sb.roleNoteKey = key;
         }
-        if (box.parentElement !== full || full.lastElementChild !== box) full.appendChild(box);
+        if (box.parentElement !== full || full.firstElementChild !== box) full.insertBefore(box, full.firstChild); // 2026-11-18: at the TOP, where the dimmed parts and their sign-in are seen (it was at the very bottom)
         box.style.display = "";
       }

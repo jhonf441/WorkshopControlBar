@@ -8,7 +8,10 @@
       // the page behind the panel cannot run the macro (the incident of 2026-10-26 was a click that landed on this button).
       function sbPowerMacroRun(macro, title, text) {
         var info = {};
-        workshopRequestMotion("", "power", macro, info)
+        // Shut down now is a STOP (power.off: for everybody, never asked, blocked or sent to sign in): it skips motion.ask, whose 401 opened the
+        // sign-in dialog silently and left the button dead without a session. Restart everything keeps the service's decision.
+        var ask = macro === "shutdown-all.g" ? Promise.resolve(true) : workshopRequestMotion("", "power", macro, info);
+        ask
           .then(function (ok) {
             if (!ok) return null;
             if (info.confirmed) return true; // the service asked and the person accepted its risk box
@@ -51,7 +54,7 @@
         } else if (!n.config.active) {
           txt = workshopPluginActive("activity") ? i18nT('sidebar.notifications_disabled') : i18nT('sidebar.notifications_disabled_short');
           color = "rgba(255,255,255,0.6)";
-        } else if (!n.config.topic) {
+        } else if (!n.config.topic_set) { // CB-4: the topic itself is not published, only whether there is one
           txt = workshopPluginActive("activity") ? i18nT('sidebar.no_destination_configured') : i18nT('sidebar.no_destination_configured_short');
           color = "#ffb300";
         } else if (sbNoticeMuted()) {
@@ -70,7 +73,7 @@
         var sil = sbNoticeMuted();
         sbT(sb.noticeBtn, sil ? i18nT('sidebar.unmute_now') : i18nT('sidebar.mute_1_h'));
         sb.noticeBtn.style.background = sil ? "#1565c0" : "#6d4c41";
-        var usable = !!(n && n.config && n.config.active && n.config.topic);
+        var usable = !!(n && n.config && n.config.active && n.config.topic_set);
         sb.noticeBtn.disabled = !usable;
         sb.noticeBtn.style.opacity = usable ? "1" : "0.5";
         sbT(sb.noticeMsg, sbNoticeMsg);

@@ -487,6 +487,8 @@
             sbHidden.sbw = 0;
             return;
           }
+          // measuring the scroll bar forces a layout: not while the page is hidden (screen off / other tab); the first measure always runs
+          if (sbHidden.sbwDone && document.hidden) return;
           var sbw = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
           if (sbw > 40) sbw = 0; // odd measure (zoom, without layout): no shift
           if (sbHidden.sbw === sbw && sbHidden.sbwDone) return; // only when the scroll bar width changed
@@ -526,6 +528,7 @@
         document.addEventListener("pointerdown", function (ev) {
           if (!sbConfig.autoClose || sidebarCollapsed) return;
           if (sidebarEl.contains(ev.target) || ev.target === sbHidden.tab) return;
+          if (ev.target && typeof ev.target.closest === "function" && ev.target.closest('[role="dialog"]')) return; // 2026-11-18: a dialog (name + PIN) is not "outside": its first digit must not fold the bar
           if (!sbOrdering && sb.configBox && sb.configBox.style.display === "flex") sbConfigOpen(false);
           if (!workshopSidebarShouldAutoClose(sbConfig.autoClose, !sidebarCollapsed, sbBusyUi())) return;
           if (sidebarEl.contains(ev.target) || ev.target === sbHidden.tab) return;

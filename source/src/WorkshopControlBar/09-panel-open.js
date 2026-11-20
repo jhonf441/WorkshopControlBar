@@ -38,6 +38,8 @@
       }
       // The tap on a locked launcher: the name + PIN dialog (a sign-in, or another person). Nothing opens.
       function sbOpenLockTap() {
+        // 2026-11-18: the bar folds first, so the dialog (outside the bar) does not find it open and the first PIN digit does not close it
+        if (typeof sidebarSetCollapsed === "function") sidebarSetCollapsed(true);
         if (typeof workshopLogin === "function") workshopLogin();
       }
       // What a launcher does when tapped: the lock dialog for a locked panel, else the panel's own toggle. Returns true when it was the lock.

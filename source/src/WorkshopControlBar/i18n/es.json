@@ -1,4 +1,12 @@
 {
+	"subjects_controlbar": {
+		"notice": "Aviso al celular",
+		"method": "Método de inicio",
+		"restart": "Reinicio",
+		"when_done": "Al terminar",
+		"timer": "Temporizador",
+		"control_bar": "Barra de control"
+	},
 	"sidebar": {
 		"locked_needs_session": "Las partes atenuadas requieren iniciar sesión.",
 		"locked_needs_role": "Las partes atenuadas requieren otro rol. Tu rol: {role}. Pide el acceso a un administrador.",
@@ -276,7 +284,7 @@
 		"choose_a_macro": "Elegí una macro",
 		"the_g_code_is_missing": "Falta el G-code",
 		"tick_at_least_one_mode": "Marca al menos un modo",
-		"only_modes_short": "solo {modes}",
+		"only_modes_short": "Solo en modo {modes}",
 		"not_with_a_job": "no con trabajo",
 		"no_action": "sin acción",
 		"macro_missing": "La macro no existe en la SD: {macro}",

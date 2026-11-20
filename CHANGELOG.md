@@ -1,5 +1,73 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.7.54 -- 2026-11-18
+
+- accessRev: the page asks whoami at once when the service says the access changed
+
+## 2.7.53 -- 2026-11-18
+
+- Access changes (users or roles switched off or on, a role changed) reach the page: it asks whoami again while in view
+
+## 2.7.52 -- 2026-11-18
+
+- Session sign-in buttons with their icon and a softer blink (shared notice); WorkshopControlBar rebuilt
+
+## 2.7.51 -- 2026-11-18
+
+- ntfy topic: reads topic_set from the published data (CB-4, installs together with the service and Activity)
+
+## 2.7.50 -- 2026-11-18
+
+- The note with the sign-in button for the dimmed parts moves from the bottom to the top of the bar
+
+## 2.7.49 -- 2026-11-18
+
+- Bar folds on a locked tap, dialogs do not fold it, no repeat of a state already on, icons on sign-in buttons, softer blink
+
+## 2.7.48 -- 2026-11-17
+
+- Back to the previous look: the family design pieces of the last rounds are removed (steppers, docks, big readings, token fills)
+
+## 2.7.47 -- 2026-11-13
+
+- Phase 6: family design pieces (docks, step numbers, fills and dark palette as shared tokens)
+
+## 2.7.46 -- 2026-11-13
+
+- Phase 6: family design pieces (docks, step numbers, fills and dark palette as shared tokens)
+
+## 2.7.45 -- 2026-11-13
+
+- Bar copies the DWC model only when nobody published lately; no scroll-bar measure while the page is hidden
+
+## 2.7.44 -- 2026-11-13
+
+- Access notices name what they lock (JS and Vue), locked covers say which section they cover
+
+## 2.7.43 -- 2026-11-13
+
+- Access notices name what they lock (JS and Vue), locked covers say which section they cover
+
+## 2.7.42 -- 2026-11-13
+
+- Access notices name what they lock (JS and Vue), locked covers say which section they cover
+
+## 2.7.41 -- 2026-11-13
+
+- Safe state and accent colors moved to family tokens; off-scale sizes and monospace fonts aligned
+
+## 2.7.40 -- 2026-11-12
+
+- Session reconcile, access notices name what they lock, kiosk native number keyboard
+
+## 2.7.39 -- 2026-11-12
+
+- Kiosk PIN: read-only field and number pad only, no full keyboard
+
+## 2.7.38 -- 2026-11-11
+
+- Owner report 2026-11-11: shutdown without session, kiosk PIN pad, hive confirm color, wheel release and Z keys, version in every page bar
+
 ## 2.7.37 -- 2026-11-10
 
 - Recipes relative to the G-code (Printing), session role switch and UI fixes (26), SD layout manifest
