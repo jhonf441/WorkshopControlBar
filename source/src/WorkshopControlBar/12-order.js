@@ -247,7 +247,7 @@
       // Only its change does something; no handler cancels a click or a pointer on it.
       function sbConfigSectionSelect(cardKey) {
         var sel = document.createElement("select");
-        sel.style.cssText = "flex:none;max-width:110px;min-height:32px;padding:4px 6px;font-size:11px;background:#1e272c;color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:4px;";
+        sel.style.cssText = "flex:none;max-width:110px;min-height:44px;padding:4px 6px;font-size:12px;background:#1e272c;color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:4px;";
         sel.title = i18nT('order.card_section_tip');
         sel.setAttribute("aria-label", sel.title);
         var op0 = document.createElement("option");
@@ -424,7 +424,7 @@
         pie.style.cssText = "display:flex;flex-direction:column;gap:6px;";
         pie.__empty = sbText(
           i18nT('order.empty_section_add_a_button_group'),
-          "font-size:11px;line-height:1.35;color:rgba(255,255,255,0.65);"
+          "font-size:12px;line-height:1.35;color:rgba(255,255,255,0.65);"
         );
         pie.appendChild(pie.__empty);
         var row = document.createElement("div");
@@ -467,11 +467,14 @@
           var B = "#" + SIDEBAR_ID;
           st.textContent = [
             "[data-sb-hidden='1']{display:none !important}",
+            // a small drawn control keeps its look and is touched over 44 px (same rule as the family's icon buttons: an invisible area)
+            "[data-sb-hit]{position:relative}",
+            "[data-sb-hit]::after{content:'';position:absolute;inset:min(0px,calc(50% - 22px))}",
             // compact: without explanation texts and with less air
             B + "[data-sb-compact='1'] [data-sb-help='1']{display:none !important}",
             B + "[data-sb-compact='1'] [data-sb-group='1']{gap:6px !important;padding:6px 6px 6px 8px !important}",
             B + "[data-sb-compact='1'] [data-sb-card='1']{gap:4px !important;padding:6px !important}",
-            B + "[data-sb-compact='1'] [data-sb-card='1'] button{min-height:28px !important;padding:3px 6px !important}",
+            B + "[data-sb-compact='1'] [data-sb-card='1'] button{min-height:44px !important;padding:3px 6px !important}",
             // foldable: tapping a card's title folds it
             B + "[data-sb-collapsible='1'] [data-sb-collapsed='1'] > :not(:first-child){display:none !important}",
             B + "[data-sb-collapsible='1'] [data-sb-card='1'] > :first-child{cursor:pointer}",
@@ -520,7 +523,7 @@
         if (!box) return;
         box.textContent = "";
         box.appendChild(sbText(i18nT('order.configure_the_bar_this_screen_only'), "font-size:13px;font-weight:bold;"));
-        box.appendChild(sbText(i18nT('order.uncheck_what_you_don_t_use'), "font-size:11px;color:rgba(255,255,255,0.65);"));
+        box.appendChild(sbText(i18nT('order.uncheck_what_you_don_t_use'), "font-size:12px;color:rgba(255,255,255,0.65);"));
         // start-up dialog (16-startup.js): the macros the buttons need, with a count of what is still pending
         if (typeof barStartupOpen === "function") {
           var pending = barStartupPending();
@@ -528,7 +531,7 @@
             sbConfigOpen(false);
             barStartupOpen();
           });
-          bp.style.minHeight = "40px";
+          bp.style.minHeight = "44px";
           box.appendChild(bp);
         }
         var items = document.createElement("div");
@@ -563,13 +566,13 @@
         var opt = sbText(i18nT('order.options'), "font-size:12px;font-weight:bold;margin-top:6px;");
         items.appendChild(opt);
         // 2026-10-12: two independent settings, same on every page.
-        var hint = "font-size:11px;color:#b0bec5;margin-bottom:4px;";
+        var hint = "font-size:12px;color:#b0bec5;margin-bottom:4px;";
         items.appendChild(sbText(i18nT('order.when_closed'), "font-size:12px;font-weight:bold;margin-top:4px;"));
         var cerr = document.createElement("div");
         cerr.style.cssText = "display:flex;gap:4px;flex-wrap:wrap;";
         [["rail", i18nT('order.icon_rail')], ["arrow", i18nT('order.arrow_only')]].forEach(function (m) {
           var bm = sbMakeButton(m[1], sbConfig.closed === m[0] ? "#1976d2" : "#455a64", function () { sbSetClosedLook(m[0]); });
-          bm.style.minHeight = "32px";
+          bm.style.minHeight = "44px";
           cerr.appendChild(bm);
         });
         items.appendChild(cerr);
@@ -655,7 +658,7 @@
             sbConfig.sections.length
               ? i18nT('order.choose_the_section_of_each_card')
               : i18nT('order.only_the_name_is_needed_the'),
-            "font-size:11px;color:rgba(255,255,255,0.6);"
+            "font-size:12px;color:rgba(255,255,255,0.6);"
           )
         );
         var actions = document.createElement("div");

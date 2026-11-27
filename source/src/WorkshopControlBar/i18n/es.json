@@ -8,8 +8,19 @@
 		"control_bar": "Barra de control"
 	},
 	"sidebar": {
-		"locked_needs_session": "Las partes atenuadas requieren iniciar sesión.",
-		"locked_needs_role": "Las partes atenuadas requieren otro rol. Tu rol: {role}. Pide el acceso a un administrador.",
+		"locked_needs_session": "Necesitan una sesión: {parts}.",
+		"locked_more": "y {n} más",
+		"part_notice": "Aviso al celular",
+		"part_notice_settings": "Ajustes del aviso",
+		"part_power": "Apagado",
+		"part_power_method": "Método de apagado",
+		"part_power_when_done": "Apagar al terminar",
+		"part_power_timer": "Temporizador",
+		"part_power_restart": "Reiniciar todo",
+		"part_power_now": "Apagar ahora",
+		"lock_short_session": "Requiere sesión",
+		"lock_short_role": "Solo {role}",
+		"locked_needs_role": "Tu rol ({role}) no puede usar: {parts}.",
 		"signed_out_login": "Sin sesión · Iniciar sesión",
 		"confirm": "Confirmar",
 		"turn_off_in_timer": "Apagar en... (temporizador)",
@@ -50,7 +61,7 @@
 		"arrange_hint": "Ordenar: arrastra desde las rayitas. Las secciones se mueven entre sí; cada tarjeta dentro de su sección. Toca Listo para terminar.",
 		"this_screen_help": "Abren/cierran paneles flotantes en ESTA pantalla. No detienen ningún proceso ni afectan a otros usuarios o pantallas.",
 		"no_panels_installed": "No hay paneles instalados.",
-		"global_machine": "GLOBAL - EQUIPO",
+		"global_machine": "Global · equipo",
 		"global_help": "Actúan sobre la máquina y el sistema: afectan a TODAS las personas y pantallas conectadas.",
 		"phone_notifications": "Notificaciones al celular",
 		"settings_ellipsis": "Configurar...",
@@ -124,7 +135,7 @@
 		"live_stop_done": "Trabajo parado con seguridad: no entran más líneas."
 	},
 	"common": {
-		"this_screen": "ESTA PANTALLA",
+		"this_screen": "Esta pantalla",
 		"close": "Cerrar",
 		"save": "Guardar",
 		"cancel": "Cancelar",
@@ -142,13 +153,13 @@
 	},
 	"hidden": {
 		"nothing_scheduled": "Nada programado",
-		"armed_when_the_job_ends": "Armado: al terminar el trabajo",
+		"armed_when_the_job_ends": "Se apaga al terminar el trabajo",
 		"no_data": "Sin dato",
 		"disconnected": "Sin conexión",
 		"machine_off": "Apagada",
 		"shuts_down_the_system_and_cuts": "Apaga el sistema y corta la energía (GLOBAL). Pide confirmación antes.",
-		"global_affects_everyone": "GLOBAL · AFECTA A TODOS",
-		"my_buttons": "MIS BOTONES",
+		"global_affects_everyone": "Global · afecta a todos",
+		"my_buttons": "Mis botones",
 		"back": "Volver",
 		"notifications": "Avisos",
 		"all": "Todos",
@@ -162,7 +173,7 @@
 		"halted": "Detenido",
 		"muted": "Silenciados",
 		"active": "Activos",
-		"scheduled_at": "Programado: {time}"
+		"scheduled_at": "Se apaga a las {time}"
 	},
 	"order": {
 		"show_all": "Mostrar todo",
@@ -281,7 +292,7 @@
 		"ask_for_confirmation_double_tap": "Pedir confirmación (doble toque)",
 		"can_be_used_with_a_job_running": "Se puede usar con un trabajo en curso",
 		"the_button_text_is_missing": "Falta el texto del botón",
-		"choose_a_macro": "Elegí una macro",
+		"choose_a_macro": "Elige una macro",
 		"the_g_code_is_missing": "Falta el G-code",
 		"tick_at_least_one_mode": "Marca al menos un modo",
 		"only_modes_short": "Solo en modo {modes}",
@@ -312,7 +323,7 @@
 		"factory_looking": "Buscando los macros de fábrica...",
 		"factory_added": "Se agregaron {n} botones de fábrica.",
 		"factory_none": "No hay nada que agregar: ningún macro de fábrica existe todavía, o sus botones ya están. Crea los macros desde la tarjeta Puesta en marcha.",
-		"buttons_caps": "BOTONES",
+		"buttons_caps": "Botones",
 		"buttons_section_help": "Macros y G-code propios, agrupados por función. Actúan sobre la máquina (todas las pantallas). Los grises con borde punteado no se pueden usar ahora (debajo dice por qué).",
 		"label_error": "{label}: error {error}"
 	},

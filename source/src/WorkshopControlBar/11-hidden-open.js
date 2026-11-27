@@ -5,7 +5,7 @@
 
       // The second line of a panel tile: [badge ........ action]. Built once (the nodes stay, so the pulse is never restarted by a repaint).
       function ocOpenTileBuild(t) {
-        t._est.style.cssText = "display:flex;align-items:center;gap:8px;min-width:0;font-size:11px;color:#b0bec5;";
+        t._est.style.cssText = "display:flex;align-items:center;gap:8px;min-width:0;font-size:12px;color:#b0bec5;";
         t._badge = ocEl("span", "flex:1 1 auto;min-width:0;display:flex;align-items:center;");
         t._cue = ocEl("span", "flex:none;display:none;color:" + SB_OPEN_TEXT + ";"); // the X: decoration only, the tile itself is the toggle
         t._cue.setAttribute("aria-hidden", "true");
@@ -27,7 +27,7 @@
         t._tit.style.fontWeight = v.on ? "700" : "500";
         t._est.style.color = v.on ? SB_OPEN_TEXT : "#b0bec5";
         t._est.style.fontWeight = v.on ? "700" : "400";
-        t._est.style.fontSize = v.on ? "12px" : "11px";
+        t._est.style.fontSize = "12px";
         t.disabled = v.disabled;
         t.style.opacity = v.disabled ? "0.5" : "1";
       }
@@ -44,7 +44,7 @@
         t.dataset.sbLocked = v.locked ? v.locked.kind : "";
         ocOpenTileSurface(t, v);
         // locked: the second line is the action the tap does (sign in / change the person) with the lock beside it; the reason is the tooltip
-        var word = v.open ? s.statusText || "" : v.busy ? s.statusText || i18nT("sidebar.panel_busy") : v.locked ? sbOpenLockAction(v.locked) : i18nT("sidebar.closed");
+        var word = v.open ? s.statusText || "" : v.busy ? s.statusText || i18nT("sidebar.panel_busy") : v.locked ? "" : i18nT("sidebar.closed"); // locked: only the lock (the tooltip and the aria-label say the reason and the action; the bar note carries the one sign-in)
         sbOpenBadge(t._badge, v.on, word);
         if (v.locked) t._est.style.color = sbOpenLockColor(v.locked);
         t._cue.style.display = v.open ? "" : "none";

@@ -214,9 +214,12 @@
         var text = document.createElement("span");
         text.style.cssText = "flex:1 1 auto;min-width:0;";
         var boton = workshopStartupButton(i18nT("startup_bar.strip_button"), "", barStartupOpen, "primary");
-        boton.style.minHeight = "40px";
-        boton.style.padding = "6px 14px";
+        boton.style.minHeight = "var(--wf-size-m, 36px)"; // the main button of the scale: 36 to the eye, 40 to the finger (sb-hit)
+        boton.style.padding = "0 12px";
         boton.style.fontSize = "13px";
+        boton.style.borderRadius = "var(--wf-radius-control, 6px)";
+        boton.style.position = "relative";
+        boton.classList.add("sb-hit");
         box.appendChild(text);
         box.appendChild(boton);
         barStartupBand = { box: box, text: text };

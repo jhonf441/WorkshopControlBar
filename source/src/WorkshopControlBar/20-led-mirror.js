@@ -158,9 +158,11 @@
       // a = the box where it starts; target = function that gives the box where it ends, read when it moves (after `wait` ms: the bar slides in
       // when it opens, so its final place is only known once it has arrived)
       function ledMorph(a, target, wait) {
+        // The owner asked (2026-11-23) for NO animation when the bar closes or opens: the indicator changes place at once, nothing travels.
+        if (typeof a !== "undefined") return;
         var ind = ledState.get().indicator;
         if (!ind || !a || !a.width) return;
-        // prefers-reduced-motion is NOT honoured here on purpose: Windows sends "reduce" when its animations are off, and the owner asked for this
+        // prefers-reduced-motion is NOT honoured here on purpose: Windows sends "reduce" when its animations are off, and this was requested
         // 0.35 s transition (it plays once, it does not loop)
         var g = document.createElement("span");
         g.setAttribute("data-tp-panel", "1");
@@ -209,6 +211,14 @@
         ledStripV.textContent = "";
       }
 
+      // ledMirrorApply runs every second: it writes a style or a title only when it changes (an equal write still invalidates the style of the
+      // page and wakes the light-theme observer; "[Violation] 'setInterval' handler took 77ms" in the ControlBar, 2026-11-23)
+      function ledSetStyle(el, prop, val) {
+        if (el.style[prop] !== val) el.style[prop] = val;
+      }
+      function ledSetTitle(el, t) {
+        if (el.title !== t) el.title = t;
+      }
       function ledMirrorApply() {
         if (!sidebarEl || !sb) return;
         var est = ledState.get();
@@ -220,7 +230,7 @@
           ledBox.style.cssText = "flex:none;padding:5px 8px 6px;background:#1e272c;border-bottom:1px solid rgba(255,255,255,0.12);";
           ledStripH = document.createElement("div");
           ledLegend = document.createElement("div");
-          ledLegend.style.cssText = "display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px 10px;margin-top:5px;font-size:11px;line-height:1.3;color:rgba(255,255,255,0.85);height:32px;overflow:hidden;";
+          ledLegend.style.cssText = "display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px 10px;margin-top:5px;font-size:12px;line-height:1.3;color:rgba(255,255,255,0.85);height:32px;overflow:hidden;";
           ledBox.appendChild(ledStripH);
           ledBox.appendChild(ledLegend);
           head.insertAdjacentElement("afterend", ledBox);
@@ -230,6 +240,7 @@
         if (sb.rail && (!ledStripV || !ledStripV.isConnected)) {
           ledStripV = document.createElement("button");
           ledStripV.type = "button";
+          ledStripV.dataset.sbRail = "1"; // round icon: the "needs session" lock text is not drawn inside it (09-role.js)
           ledStripV.style.cssText = "width:30px;height:30px;flex:none;padding:0;margin:2px 0 4px;border-radius:50%;border:2px solid #1e272c;outline:1px solid rgba(255,255,255,0.25);cursor:pointer;";
           ledStripV.addEventListener("click", function (ev) {
             ev.stopPropagation();
@@ -238,14 +249,14 @@
           sb.rail.insertBefore(ledStripV, sb.rail.firstChild);
         }
         var ver = ledShowStatus(est, sbVerLeds(), ledLightsActive()); // gear: "Status lights at the top of the bar"
-        ledBox.style.display = ver && !sidebarCollapsed ? "block" : "none";
-        if (ledStripV) ledStripV.style.display = ver && sidebarCollapsed ? "flex" : "none";
+        ledSetStyle(ledBox, "display", ver && !sidebarCollapsed ? "block" : "none");
+        if (ledStripV) ledSetStyle(ledStripV, "display", ver && sidebarCollapsed ? "flex" : "none");
         if (ver) {
           if (ledStripV) {
             ledRailPaint(est);
           }
           // the badge text (ellipsis span inside an inline-flex row) must also shrink and scroll
-          ledStripH.querySelectorAll("span").forEach(function (sp) {
+          if (ledStripH._mqSig !== ledStripH.childElementCount + "|" + est.id) ledStripH.querySelectorAll("span").forEach(function (sp) {
             if (sp.style.textOverflow === "ellipsis" && !sp._sbMq) {
               sp.parentElement.style.maxWidth = "100%";
               sp.style.flex = "0 1 auto";
@@ -265,19 +276,30 @@
             ledLegend.appendChild(sbMarquee(it));
           });
           ledLegend._signature = leyFirma;
+          ledStripH._mqSig = ledStripH.childElementCount + "|" + est.id;
           // The legend always takes two rows, whatever the number of active states: the ones that do not
           // fit are folded into a "+N" chip (the full list is in the tooltip), so the bar never changes size.
-          var fitKey = ledLegend.clientWidth + "|" + leyFirma;
-          if (ledBox.style.display !== "none" && ledLegend.clientWidth > 0 && ledLegend._fitKey !== fitKey) {
+          // Its width is read (a layout) only when something that can change it changed: the states, the window or the bar opening.
+          var widthKey = leyFirma + "|" + window.innerWidth + "|" + ledBox.style.display;
+          if (ledLegend._widthKey !== widthKey) {
+            ledLegend._widthKey = widthKey;
+            ledLegend._width = ledLegend.clientWidth;
+          }
+          var fitKey = ledLegend._width + "|" + leyFirma;
+          if (ledBox.style.display !== "none" && ledLegend._width > 0 && ledLegend._fitKey !== fitKey) {
             ledLegendAdjust();
             ledLegend._fitKey = fitKey;
           }
           var t = i18nT('sidebar.status_leds', { text: ledTextLegend(est) + (est.text ? " (" + est.text + ")" : "") });
-          ledBox.title = t;
-          if (ledStripV) ledStripV.title = i18nT('sidebar.status_leds_tap_to_open', { text: t });
+          ledSetTitle(ledBox, t);
+          if (ledStripV) ledSetTitle(ledStripV, i18nT('sidebar.status_leds_tap_to_open', { text: t }));
         }
-        // The arrow tab of the closed bar shows the state with its whole area: a layer of the state color
-        // behind the arrow, animated with the state effect. The arrow stays on top and readable.
+        ledMirrorArrow(est);
+      }
+
+      // The arrow tab of the closed bar shows the state with its whole area: a layer of the state color
+      // behind the arrow, animated with the state effect. The arrow stays on top and readable.
+      function ledMirrorArrow(est) {
         var pest = typeof sbHidden !== "undefined" && sbHidden.tab;
         if (pest) {
           if (!pest._state) {
@@ -293,17 +315,19 @@
           var verArrow = !!est.indicator && !sbConfig.withoutArrow && ledLightsActive();
           if (verArrow) {
             marks.forEach(function (m) {
-              m.style.display = "flex";
+              ledSetStyle(m, "display", "flex");
               ledLayerPaint(m, est.indicator);
             });
-            pest.title = i18nT('sidebar.open_the_control_bar') + " - " + est.indicator.name;
+            ledSetTitle(pest, i18nT('sidebar.open_the_control_bar') + " - " + est.indicator.name);
           } else {
             marks.forEach(function (m) {
+              if (m.style.display === "none" && !m._sig) return; // already off: nothing to stop
               m.style.display = "none";
+              m._sig = "";
               ledState.fx(m, "steady");
               ledLayerStop(m);
             });
-            pest.title = i18nT('sidebar.open_the_control_bar');
+            ledSetTitle(pest, i18nT('sidebar.open_the_control_bar'));
           }
         }
       }

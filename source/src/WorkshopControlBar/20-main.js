@@ -59,7 +59,7 @@
       // it does not block the whole page.
       var orphanOverlaySeen = typeof WeakSet !== "undefined" ? new WeakSet() : null;
       function checkOrphanOverlays() {
-        if (pluginStopped || !orphanOverlaySeen) return;
+        if (pluginStopped || !orphanOverlaySeen || document.hidden) return; // nothing to unblock while nobody sees the page (screen off, other tab)
         // Vuetify 4 (DWC 3.7) has none of the Vuetify 2 classes below, so every overlay would look orphaned: the watchdog is a 3.6 tool
         if (workshopHostKind() === "37") return;
         var owners = document.querySelectorAll(
@@ -97,7 +97,7 @@
       var orphanOverlayTimer = setInterval(checkOrphanOverlays, 1500);
 
       // the <style> elements only this plugin uses leave the page when it stops (the shared ones go with the last plugin: workshopRemoveLeftovers)
-      var BAR_OWN_STYLES = ["workshop-sb-role-css", "workshop-bar-hidden-css", "workshop-sb-hidden-css", "workshop-bar-oc-filter-css", "workshop-bar-oc-css", SB_OPEN_STYLE_ID];
+      var BAR_OWN_STYLES = ["workshop-sb-role-css", "workshop-bar-hidden-css", "workshop-bar-scale-css", "workshop-sb-hidden-css", "workshop-bar-oc-filter-css", "workshop-bar-oc-css", SB_OPEN_STYLE_ID];
       workshopOwnStyles(BAR_OWN_STYLES);
 
       workshopOnStop(function () {

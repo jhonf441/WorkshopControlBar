@@ -10,7 +10,7 @@
 
 A side bar ("Controls") available on every DWC page: machine state with the status light, live-job stop, which floating panels are open on THIS screen (Camera, Jog), your own macro and G-code buttons grouped by function (lighting, laser, machine mode, power supply and restart, CNC zero, power usage), a global switch (phone notices) and "Shut down now" (safe shutdown of everything). It also schedules the power off at the end of a job.
 
-Version documented: 2.7.x on DWC 3.6.3.
+Version documented: 2.11.x on DWC 3.6.3.
 
 ## 1. Requirements
 
@@ -18,7 +18,7 @@ Version documented: 2.7.x on DWC 3.6.3.
 
 ## 2. Install
 
-1. Install WorkshopService. 2. DWC > Settings > Plugins > Install `WorkshopControlBar-<ver>.zip`; Start. Reload DWC. 3. The bar appears at the right edge (panel "Controls"; a rail of icons or an arrow when hidden). 4. Verify: it shows the machine state line and "THIS SCREEN" buttons; the start-up chip lists which macros are missing.
+1. Install WorkshopService. 2. DWC > Settings > Plugins > Install `WorkshopControlBar-<ver>.zip`; Start. Reload DWC. 3. The bar appears at the right edge (panel "Controls"; a rail of icons or an arrow when hidden). 4. Verify: it shows the machine state line and "This screen" buttons; the start-up strip ("N left to set up for the bar", with its "Set up" button) lists which macros are missing.
 
 ## 3. Functions
 
@@ -26,7 +26,7 @@ Version documented: 2.7.x on DWC 3.6.3.
 
 ![Bar open in a DWC page](img/01-bar-in-page.png)
 
-Picture 1: the bar open at the right of a DWC page ("Controls"), scrolled to its bottom.
+Picture 1: the bar open at the right of a DWC page ("Controls"), scrolled to its bottom: "Edit buttons", the start-up strip, the version line, the group "Global · affects everyone" (Alerts, Shutdown) and the red "Shut down now" button.
 
 ### Status and header
 
@@ -38,7 +38,7 @@ Picture 1: the bar open at the right of a DWC page ("Controls"), scrolled to its
 
 ![State in the open bar](img/10-bar-state-open-panel.png)
 
-Picture 10: the open bar (red rectangle): the colored dot, the name of the state ("POWER SUPPLY OFF (no power in the motors)") and, under it, the other active states ("RS485 warning (device with no axis)") and the machine mode. The dot blinks or pulses like the status light.
+Picture 10: the open bar (red rectangle): the colored dot, the name of the state ("Power supply off (no power in the motors)"), then the live job strip and the machine state line ("Available"). The dot blinks or pulses like the status light.
 
 #### State on the arrow and on the rail
 - What: when the bar is closed the state does not disappear: the arrow takes the colors of the status light as stripes, and the rail shows a round indicator (a pie with the same colors) above its icons.
@@ -47,15 +47,15 @@ Picture 10: the open bar (red rectangle): the colored dot, the name of the state
 
 ![State on the arrow](img/11-bar-arrow-shows-the-state.png)
 
-Picture 11: the bar closed as an arrow: the stripes are the colors of the status light (here amber, blue and green, as in picture 10).
+Picture 11: the bar closed as an arrow: the stripes are the colors of the status light (here amber, blue and green).
 
 ![Icon rail](img/12-bar-icon-rail-closed.png)
 
-Picture 12: the bar closed as an icon rail (large red rectangle): the arrow to open it, the round state indicator (small rectangle), the live job stop, the screen buttons (camera, jog) under LOCAL and the global ones (groups, power, timer, alerts) under GLOBAL. The page makes room for it.
+Picture 12: the bar closed as an icon rail (large red rectangle): the arrow to open it, the round state indicator (small rectangle), the live job stop, the screen buttons (camera, jog) under LOCAL and the global ones (groups, power, timer, alerts) under GLOBAL (the camera relay icon joins them when its card is switched on). The page makes room for it.
 
 ![Bar top](img/02-bar-status-and-panels.png)
 
-Picture 2: top of the bar: title row with ">" and the gear; state line; live job strip with "Stop"; state "Busy"; "THIS SCREEN" with Camera and Jog; "MY BUTTONS" chips.
+Picture 2: top of the bar: title row with ">" and the gear; state line; live job strip with "Stop"; machine state ("Available"); "This screen" with Camera and Jog; "My buttons" chips.
 
 #### Collapse and open the bar
 - What: hides the bar so the page uses the full width, and shows it again.
@@ -77,37 +77,37 @@ Picture 9: the bar collapsed to the arrow tab at the right edge (middle right).
 
 #### Open or close the Camera panel
 - What: opens or closes the floating camera viewer of WorkshopCamera on THIS screen only. It does not stop any process nor affect other users.
-- Where: group "THIS SCREEN", button "Camera" with its state "Open" / "Closed" (picture 2).
+- Where: group "This screen", button "Camera" with its state "Open" / "Closed" (picture 2).
 - How: 1. Press "Camera" to open the viewer. 2. Press it again to close it.
 - Watch out: needs WorkshopCamera installed; the group says "No panels installed." otherwise. The bar only opens and closes the viewer: to start or stop the camera relay (the process that serves the video) use the Cameras tab of the page of WorkshopCamera, or turn on the optional relay card of the bar (gear > the switch of that card, off by default).
 
 #### Open or close the Jog panel
 - What: opens or closes the floating Jog panel of WorkshopJog on this screen only.
-- Where: group "THIS SCREEN", button "Jog" (picture 2).
+- Where: group "This screen", button "Jog" (picture 2).
 - How: same as the camera button.
 - Watch out: opening the panel moves nothing; moving is done inside the Jog panel.
 
 #### How you see that a panel is open
 - What: a panel that is open on this screen shows at first sight in the three places where the bar lists it. Its tile (the switch of the compact view) is filled with the accent blue, says "Open" with a small dot that pulses softly, and shows the action "Close" at its right. Its icon in the closed rail is filled blue with a white-blue ring and the same pulsing dot in the corner. Its card in the arrange list is filled blue, its status line says "Open on this screen" with the dot, and its button says "Close <panel>". A closed panel keeps the quiet gray look and says "Closed". A panel that is still closing (it stops what it is doing first) keeps the open look with its own words.
-- Where: group "THIS SCREEN" (tile and card) and "LOCAL" in the closed rail (icon).
+- Where: group "This screen" (tile and card) and "LOCAL" in the closed rail (icon).
 - How: nothing to press; it follows the panel. It works for any panel a plugin registers in the shared registry, including panels of plugins added later: the bar names none.
-- Watch out: it does not depend on colour alone: the words ("Open", "Close"), the dot, the ring and the pressed state that screen readers announce change too. With the system setting "reduce motion" the dot stays on and does not pulse. Touch targets are 44 px tall. The pictures of this README were taken before this look.
+- Watch out: it does not depend on colour alone: the words ("Open", "Close"), the dot, the ring and the pressed state that screen readers announce change too. With the system setting "reduce motion" the dot stays on and does not pulse. Touch targets are 44 px tall.
 
 ### My buttons (macros and G-code)
 
 ![Button groups](img/03-bar-button-groups.png)
 
-Picture 3: button groups: Lighting, Laser, Machine mode, Power supply and restart. A green dot and "ACTIVE" mark the current state.
+Picture 3: button groups: Laser, CNC zero, Machine mode (and, below, Power supply and restart). A green dot and "ACTIVE" mark the current state; the buttons that cannot be used now (CNC zero outside CNC mode) are grey with a dashed border and the reason.
 
 #### Group filter chips and fold a group
 - What: chips filter the list ("All" or one group); tapping a group title folds it.
-- Where: below "MY BUTTONS", row of chips (picture 2); the group titles carry a small arrow at the right (picture 3).
+- Where: below "My buttons", row of chips (picture 2); the group titles carry a small arrow at the right (picture 3).
 - How: 1. Tap a chip to show only that group. 2. Tap a group title to fold or open it.
 - Watch out: stored for this screen only. The line "Current mode: Laser" tells which machine mode the buttons are judged against.
 
 #### Work light and status LEDs
 - What: "Light ON" / "Light OFF" switch the work light (LEDs 0-19); "Status ON" / "Status OFF" switch the status LEDs (LEDs 20-36, normally automatic from the mode and the machine state).
-- Where: first group, "Lighting" (the group name is the owner's own) (picture 2, bottom).
+- Where: first group, "Lighting" (the group name can be changed) (picture 2, bottom).
 - How: 1. Press the button. 2. Wait for the dot and "ACTIVE" to move to it.
 - Watch out: it changes the real lights for everyone. A button with no answer in 15 s says "no response in 15 s. It may have run anyway: check the button state before repeating it.". Operator role.
 
@@ -119,28 +119,28 @@ Picture 3: button groups: Lighting, Laser, Machine mode, Power supply and restar
 
 #### Machine mode switch
 - What: switches the machine between 3D printing (FFF mode), Laser mode and CNC mode (speeds, limits, probe, PWM). The current mode is disabled.
-- Where: group "Machine mode" (picture 3, middle).
+- Where: group "Machine mode" (picture 3, bottom).
 - How: 1. Press the mode you want. 2. Confirm (double tap, "Confirm?"). 3. Wait for "ACTIVE" to move.
 - Watch out: technician role. Not available while a job is running.
 
 #### Power supply and Restart everything
 - What: "PSU Start" / "PSU Stop" switch the motor power supply from the Duet; "Restart everything" resets the Duet (M999) and reboots the system in software without cutting power.
-- Where: group "Power supply and restart" (picture 3, bottom; "Restart everything" at the top of picture 4).
+- Where: group "Power supply and restart" (below "Machine mode"; "Restart everything" at the end of the group).
 - How: 1. Press the button. 2. Confirm. 3. After "Restart everything" wait 1-2 minutes for the screen to come back.
 - Watch out: Technician role for the supply; administrator for "Restart everything" (`power.full_reset`).
 
 #### CNC zero and Power usage groups
 - What: "Capture Zero" saves the current position as a fixed reference and "Set Zero" uses it as the work zero (CNC mode only). The Power usage group reads the energy meter and offers the report buttons (Report, Monthly report, Yearly report).
-- Where: groups "CNC zero" and "Power usage" in "MY BUTTONS"; they appear only when the group exists. They are not in the pictures (the machine is in Laser mode).
+- Where: groups "CNC zero" (picture 3, middle) and "Power usage" in "My buttons"; they appear only when the group exists. In picture 3 the machine is in Laser mode, so the CNC zero buttons are grey.
 - How: press the button; the reports open the Power page.
 
 ![Bottom of the bar](img/04-bar-global-and-shutdown.png)
 
-Picture 4: bottom of the bar: "Restart everything", the "Edit buttons" button, the versions line, the group "GLOBAL - AFFECTS EVERYONE" (Alerts, Shutdown) and the red "Shut down now" button.
+Picture 4: bottom of the bar: the "Edit buttons" button, the start-up strip, the version line, the group "Global · affects everyone" (Alerts, Shutdown) and the red "Shut down now" button.
 
 #### Edit buttons (add, edit, delete, reorder)
 - What: edit mode to change the groups and buttons of "MY BUTTONS". A button is a macro or G-code lines.
-- Where: "Edit buttons" button below the groups (picture 4, middle). In edit mode each group shows grip dots to drag (picture 8 shows the same grip dots).
+- Where: "Edit buttons" button below the groups (picture 4, top). In edit mode each group shows grip dots to drag (picture 8 shows the same grip dots in arrange mode).
 - How: 1. Press "Edit buttons". 2. Drag by the grip dots to reorder, also between groups. 3. In a group press "+ Button" to add, press a button to edit it; delete needs a double tap. 4. Press Done.
 - Watch out: It saves to the system and applies to all screens. Technician role.
 
@@ -180,10 +180,10 @@ Picture 4: bottom of the bar: "Restart everything", the "Edit buttons" button, t
 
 ![Gear: sections](img/05-gear-visible-sections.png)
 
-Picture 5: gear open: "Configure the bar (this screen only)", the "Start-up" button and the list of sections to show.
+Picture 5: gear open: "Configure the bar (this screen only)", the "Start-up" button and the list of sections to show (This screen, Buttons and each group, Global · machine).
 
 #### What shows and the start-up card
-- What: tick or untick each section (THIS SCREEN, BUTTONS and each group, GLOBAL - MACHINE with Alerts, Shutdown) to show it in the bar and the rail on this screen. "Start-up" opens the card that lists which macro files the buttons need (light, air, power supply).
+- What: tick or untick each section (This screen, Buttons and each group, Global · machine with Phone notifications, Shutdown) to show it in the bar and the rail on this screen. "Start-up" opens the card that lists which macro files the buttons need (light, air, power supply).
 - Where: gear at the top right of the bar > top of the options (picture 5).
 - How: 1. Press the gear. 2. Untick what you do not use. 3. Press "Close" at the bottom.
 - Watch out: hidden buttons are not deleted. Per screen.
@@ -196,7 +196,7 @@ Picture 5: gear open: "Configure the bar (this screen only)", the "Start-up" but
 
 ![Gear: options](img/06-gear-closed-style-and-options.png)
 
-Picture 6: gear options: "When closed" (Icon rail / Arrow only), "Automatic collapse", "Make room for the bar" and the status lights option.
+Picture 6: gear options: "When closed" (Icon rail / Arrow only), "Automatic collapse", "Make room for the bar" and "Safe stop of the live job on the bar".
 
 #### Style when closed (Icon rail or Arrow only)
 - What: "Icon rail" leaves a narrow strip of icons (picture 12); "Arrow only" hides the bar and leaves a small arrow on the edge (picture 11).
@@ -226,7 +226,7 @@ Picture 13: "Make room for the bar" off: the open bar (red rectangle) floats ove
 
 ![Gear: custom sections](img/07-gear-custom-sections-and-arrange.png)
 
-Picture 7: bottom of the gear options: custom sections, "Arrange cards", "Show all" and "Close".
+Picture 7: bottom of the gear options: "Compact", "Collapsible cards", custom sections, "Arrange cards", "Show all" and "Close".
 
 #### Custom sections, Arrange cards and Show all
 - What: "+ Section" creates an empty named section to fill with cards or button groups; "Arrange cards" lets you drag sections and cards; "Show all" shows again everything hidden.
@@ -236,7 +236,7 @@ Picture 7: bottom of the gear options: custom sections, "Arrange cards", "Show a
 
 ![Arrange mode](img/08-arrange-cards-mode.png)
 
-Picture 8: arrange mode: grip dots at the left of each group title and the "Done" button next to the gear (top right).
+Picture 8: arrange mode: grip dots at the left of each group title, each group with its description, and the "Done" button next to the gear (top right).
 
 ## 4. Settings
 

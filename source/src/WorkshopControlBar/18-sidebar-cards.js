@@ -11,7 +11,7 @@
         sbOrderRegister("sections", full);
         sb.orderHint = sbText(
           i18nT('sidebar.arrange_hint'),
-          "display:none;font-size:11px;line-height:1.35;color:var(--wf-n-down-text,#ffe082);background:rgba(255,224,130,0.1);border-radius:6px;padding:6px;"
+          "display:none;font-size:12px;line-height:1.35;color:var(--wf-n-down-text,#ffe082);background:rgba(255,224,130,0.1);border-radius:6px;padding:6px;"
         );
         full.appendChild(sb.orderHint);
         // panel del engranaje (lo llena sbConfigRender, 12-order.js)
@@ -39,7 +39,7 @@
         sbOrderRegister("local", sb.localCards);
         sb.noPanels = sbText(
           i18nT('sidebar.no_panels_installed'),
-          "font-size:11px;color:rgba(255,255,255,0.5);"
+          "font-size:12px;color:rgba(255,255,255,0.5);"
         );
         gLocal.appendChild(sb.noPanels);
       }
@@ -56,10 +56,11 @@
         toggle.id = SIDEBAR_TOGGLE_ID;
         toggle.type = "button";
         toggle.style.cssText = [
-          "width:34px",
-          "height:34px",
+          "position:relative",
+          "width:var(--wf-size-s, 32px)",
+          "height:var(--wf-size-s, 32px)",
           "flex:none",
-          "border-radius:6px",
+          "border-radius:var(--wf-radius-control, 6px)",
           "border:1px solid rgba(255,255,255,0.5)",
           "background:#455a64",
           "color:#fff",
@@ -77,6 +78,7 @@
           ev.stopPropagation();
           sidebarSetCollapsed(!sidebarCollapsed);
         });
+        toggle.classList.add("sb-hit"); // 32 to the eye, 40 to the finger (10-sidebar-scale.js)
         head.appendChild(toggle);
         sb.toggle = toggle;
 
@@ -88,7 +90,7 @@
           sbSetOrdering(!sbOrdering);
         });
         sb.orderBtn.style.flex = "none";
-        sb.orderBtn.style.minHeight = "32px"; // DESIGN.md: touch targets of at least 32 px (QA-12)
+        sb.orderBtn.style.minHeight = "44px"; // 44 px always
         sb.orderBtn.style.padding = "3px 10px";
         sb.orderBtn.title = i18nT('sidebar.finish_arranging');
         sb.orderBtn.style.display = "none"; // only seen while ordering ("Done")
@@ -99,7 +101,7 @@
         sb.gearBtn.title = i18nT('sidebar.configure_the_bar_what_s_shown');
         sb.gearBtn.setAttribute("aria-label", sb.gearBtn.title);
         sb.gearBtn.style.cssText =
-          "width:32px;height:32px;flex:none;border-radius:6px;border:1px solid rgba(255,255,255,0.35);background:#455a64;color:#fff;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;";
+          "position:relative;width:var(--wf-size-s, 32px);height:var(--wf-size-s, 32px);flex:none;border-radius:var(--wf-radius-control, 6px);border:1px solid rgba(255,255,255,0.35);background:#455a64;color:#fff;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;";
         sb.gearBtn.innerHTML = sbIconSvg(
           '<path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>',
           18,
@@ -111,6 +113,7 @@
           if (sidebarCollapsed) sidebarSetCollapsed(false);
           sbConfigOpen(abrir);
         });
+        sb.gearBtn.classList.add("sb-hit"); // 32 to the eye, 40 to the finger (10-sidebar-scale.js)
         head.appendChild(sb.gearBtn);
       }
 
@@ -130,20 +133,17 @@
         sb.railLocal = document.createElement("div");
         sb.railLocal.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:6px;";
         rail.appendChild(sb.railLocal);
-        var railSep = document.createElement("div");
-        railSep.style.cssText = "width:28px;height:2px;background:" + SIDEBAR_GLOBAL_COLOR + ";margin:6px 0 0 0;";
-        rail.appendChild(railSep);
         rail.appendChild(sbRailCaption("GLOBAL", SIDEBAR_GLOBAL_COLOR));
         sb.railButtons = sbMakeRailBtn("grid", i18nT('sidebar.custom_buttons_rail'), "btnCard");
         rail.appendChild(sb.railButtons);
         sb.railPower = sbMakeRailBtn("power", i18nT('sidebar.shut_down_now_rail'), "powerCard");
-        sb.railPower.style.background = "#b71c1c";
+        sb.railPower.style.background = "#c62828"; // error fill: the darker emergency red is only for the emergency stop (DESIGN 2)
         rail.appendChild(sb.railPower);
         sb.railTimer = sbMakeRailBtn("timer", i18nT('sidebar.shut_down_when_done_global'), "powerCard");
         rail.appendChild(sb.railTimer);
         // Label visible under the clock when the shutdown is armed --
         // it has to be seen even if the bar is collapsed.
-        sb.railTimerLabel = sbText("", "font-size:10px;font-weight:bold;color:var(--wf-n-down-text,#ffb74d);text-align:center;width:100%;");
+        sb.railTimerLabel = sbText("", "font-size:12px;font-weight:bold;color:var(--wf-n-down-text,#ffb74d);text-align:center;width:100%;");
         rail.appendChild(sb.railTimerLabel);
         sb.railNotice = sbMakeRailBtn("bell", i18nT('sidebar.phone_notifications_global'), "notificationCard");
         rail.appendChild(sb.railNotice);
@@ -168,7 +168,7 @@
         });
         sb.noticeSettingsBtn.style.display = "none";
         notifRow.appendChild(sb.noticeSettingsBtn);
-        sb.noticeMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
+        sb.noticeMsg = sbMsgLine("font-size:12px;color:var(--wf-n-down-text,#ffe082);");
         notifCard.appendChild(sb.noticeMsg);
         sb.noticeHelp = sbText("");
         notifCard.appendChild(sb.noticeHelp);
@@ -191,7 +191,7 @@
       function sbBuildPowerMethod(powerCard) {
         // How it shuts down: meter (cuts everything) or the Duet's PS_ON (M81). Used by
         // Shut down now, Shut down when finished and the timer.
-        sb.methodTitle = sbText(i18nT('sidebar.how_it_powers_off'), "font-size:11px;font-weight:bold;color:rgba(255,255,255,0.85);");
+        sb.methodTitle = sbText(i18nT('sidebar.how_it_powers_off'), "font-size:12px;font-weight:bold;color:rgba(255,255,255,0.85);");
         powerCard.appendChild(sb.methodTitle);
         sb.methodRow = sbRow(powerCard);
         sb.methodButtons = {};
@@ -241,13 +241,13 @@
         });
         sb.methodDesc = sbText("", "font-size:12px;line-height:1.35;color:#fff;");
         powerCard.appendChild(sb.methodDesc);
-        sb.methodNotice = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffb74d);");
+        sb.methodNotice = sbMsgLine("font-size:12px;color:var(--wf-n-down-text,#ffb74d);");
         powerCard.appendChild(sb.methodNotice);
         sb.methodHelp = sbText(
           i18nT('sidebar.meter_the_smart_meter_or_switch')
         );
         powerCard.appendChild(sb.methodHelp);
-        sb.methodMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
+        sb.methodMsg = sbMsgLine("font-size:12px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.methodMsg);
         powerCard.appendChild(sbReasonEl("method"));
         sb.powerMethodEls = [sb.methodTitle, sb.methodRow, sb.methodPi, sb.relayRow, sb.methodDesc, sb.methodNotice, sb.methodHelp, sb.methodMsg]; // role: technician (09-role.js)
@@ -260,6 +260,8 @@
         powerCard.appendChild(sep0);
         var nowRow = sbRow(powerCard);
         var nowBtn = sbMakeButton(i18nT('sidebar.shut_down_now'), "#c62828", function () {});
+        nowBtn.dataset.sbCritical = "1"; // cuts the power: 48 px, never the compact scale
+        nowBtn.style.minHeight = "var(--wf-hit-critical, 48px)";
         // one press, one risk box (19-sidebar-actions.js): a stray click on the page behind the panel cannot shut the machine down
         sbDangerPress(nowBtn, function () {
           sbPowerMacroRun("shutdown-all.g", i18nT('sidebar.shut_down_now'), i18nT('sidebar.shut_down_now_confirm'));
@@ -295,9 +297,9 @@
         endRow.appendChild(sb.shutdownBtn);
         sb.shutdownContext = sbText("");
         powerCard.appendChild(sb.shutdownContext);
-        sb.shutdownMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
+        sb.shutdownMethodLn = sbMsgLine("font-size:12px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
         powerCard.appendChild(sb.shutdownMethodLn);
-        sb.shutdownMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
+        sb.shutdownMsg = sbMsgLine("font-size:12px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.shutdownMsg);
         powerCard.appendChild(sbReasonEl("when_done"));
         sb.powerWhenDoneEls = [sep, sb.shutdownStatus, endRow, sb.shutdownContext, sb.shutdownMethodLn, sb.shutdownMsg]; // role: operator
@@ -350,11 +352,11 @@
           sbTimingAction(null);
         });
         tempoRow2.appendChild(sb.timingCancelBtn);
-        sb.timingMsg = sbMsgLine("font-size:11px;color:var(--wf-n-down-text,#ffe082);");
+        sb.timingMsg = sbMsgLine("font-size:12px;color:var(--wf-n-down-text,#ffe082);");
         powerCard.appendChild(sb.timingMsg);
         sb.timingText = sbText("");
         powerCard.appendChild(sb.timingText);
-        sb.timingMethodLn = sbMsgLine("font-size:11px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
+        sb.timingMethodLn = sbMsgLine("font-size:12px;font-weight:bold;color:var(--wf-n-session-text,#90caf9);");
         powerCard.appendChild(sb.timingMethodLn);
         powerCard.appendChild(sbReasonEl("timer"));
         sb.powerTimerEls = [sep2, sb.timingStatus, sb.timingRow, tempoRow2, sb.timingMsg, sb.timingText, sb.timingMethodLn]; // role: operator

@@ -2,7 +2,7 @@
   "id": "WorkshopControlBar",
   "name": "Control Bar",
   "author": "jhonf441",
-  "version": "2.7.54",
+  "version": "2.11.0",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/jhonf441/WorkshopControlBar",
   "tags": [
@@ -41,7 +41,7 @@
     "permissions.json"
   ],
   "dwcFiles": [
-    "js/WorkshopControlBar.ca661f62.js",
-    "js/WorkshopControlBar.ca661f62.js.gz"
+    "js/WorkshopControlBar.1ee24f94.js",
+    "js/WorkshopControlBar.1ee24f94.js.gz"
   ]
 }

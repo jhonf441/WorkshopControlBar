@@ -40,7 +40,7 @@
         if (typeof workshopReasonGroupEl !== "function") return document.createComment("");
         var box = workshopReasonGroupEl(sbReasonItems(group), { need: SB_REASON_NEED[group], subject: i18nT("subjects_controlbar." + group) });
         box.style.marginTop = "4px";
-        box.style.fontSize = "11px";
+        box.style.fontSize = "12px";
         sbReasonWatch();
         return box;
       }

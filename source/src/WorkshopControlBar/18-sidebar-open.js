@@ -32,10 +32,12 @@
         el.title = label;
       }
 
-      // The launcher in the rail: a 44 px tall touch target (the rail is 44 wide, 42 inside its border: 40 wide), the icon in a box of its own
-      // and the dot of an open panel in the corner.
+      // The launcher in the rail: 32 px to the eye with a 40 px area (the scale of the family, 2026-11-23), the icon in a box of its own and the
+      // dot of an open panel in the corner.
       function sbOpenRailBuild(ui) {
-        ui.rail.style.width = "40px";
+        ui.rail.classList.add("sb-hit");
+        if (!ui.rail.style.position) ui.rail.style.position = "relative";
+        ui.rail.style.width = SB_OPEN_TOUCH + "px";
         ui.rail.style.height = SB_OPEN_TOUCH + "px";
         ui.rail.setAttribute("aria-pressed", "false");
         sbH(ui.rail, ""); // the icon the button got when it was made (sbMakeRailBtn) moves into a box of its own, next to the dot
@@ -66,6 +68,7 @@
         ui.status.style.display = "flex";
         ui.status.style.alignItems = "center";
         ui.btn.style.minHeight = SB_OPEN_TOUCH + "px";
+        ui.btn.classList.add("sb-hit"); // 32 to the eye, 40 to the finger (10-sidebar-scale.js)
       }
 
       // The tooltip of a launcher: the panel's own, or the words of its state; a locked panel says its reason and what the tap does

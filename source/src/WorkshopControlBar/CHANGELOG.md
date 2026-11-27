@@ -1,5 +1,82 @@
 # WorkshopControlBar -- historial de versiones
 
+## 2.11.0 -- 2026-11-23
+
+- Redesign batch 1 (informes/auditoria-diseno-23nov/FAMILIA-REDISENO.md), on the tokens of the family (front-23nov bc31d73b): the rail is 44 px wide with
+  32 px icons (glyph 18) and an invisible 40 px touch area; the fold button and the gear of the head, the panel launchers and the buttons of the cards are
+  32 px with the same area, text 12.
+- The stops stay 48 px and never take the compact scale: the stop of a live job and "Shut down now" (card and Hidden style).
+- Sections without boxes: the label is a word in its colour (no pill) and the rail marks each section with a line of its colour (LOCAL blue, GLOBAL
+  orange; the word stays for screen readers and the tooltip). Cards are rows split by a line, no grey sub-card; the card icon keeps its section colour.
+- Every row of a card (energy, phone notices...) is a row of 48 px with a line between rows.
+- The notices center keeps getting the real width of the bar (rail or open, floating or reserved), so no veil covers a stop.
+- ux review: the open-panel ">" at 32 with the 40 px area; "Configurar" is the main button at 36; "Agregar botones de fabrica" (the main action of an
+  empty bar) is the family blue at 36, no teal; the filter chips are 32 px segments with the 40 px area; section titles 12/600 in sentence case in
+  their colour; one mark per section in the closed rail; "Apagar ahora" keeps 48 with the error red #c62828 (#b71c1c is only the emergency stop).
+- The board of the Hidden style (the look of the bar): phone notices and shutdown are rows of 48 with no box (icon 18, name 13/600, state 12 under it,
+  arrow on the right, a line under each), not grey sub-cards of 72.
+
+## 2.10.1 -- 2026-11-23
+
+- No animation when the bar opens or closes (owner): the side panel no longer slides (transition none) and the status indicator no longer travels between boxes (ledMorph is off); everything changes place at once.
+
+## 2.10.0 -- 2026-11-23
+
+- After the PIN asked by a locked launcher, the panel opens by itself (note 10): workshopLoginThen waits up to 3 s for the new person's permissions.
+- The status LED mirror is state: it is never locked by the session or the role (note 8); it writes styles only when they change.
+- Notices go through the family notices center (window.__workshopNotices v3): one place, bottom right on wide screens, one card that closes by itself on small screens (notes 13 and 17). The bar tells the center its real width, so no notice, veil or help card covers its STOP.
+- Placement watched with a ResizeObserver instead of a layout read every second (note 15).
+- Small screens: the open bar is a sheet over a veil, Escape or a tap on the veil closes it (note 16); the rail makes room from 320 px.
+- Session chip in the page language, 32 px drawn with a 44 px touch area; help folds and help cards have a height cap and stay left of the bar.
+- Native selects show only the drawn arrow.
+
+## 2.9.2 -- 2026-11-23
+
+- optional files are never requested when absent
+
+## 2.9.1 -- 2026-11-22
+
+- select arrows, one focus ring per field, shared family stylesheet split
+
+## 2.9.0 -- 2026-11-22
+
+- Macro picker from the catalogue, help and checks for the state by object model
+
+## Unreleased -- macro picker and object model state (22-nov-2026 review, lote 6)
+
+- The macro of a button is chosen from the service's catalogue (`macros.catalog`), in two groups: "Your macros" (`0:/macros`) and "Workshop macros (to call)": only the ones a plugin declares for the person in its `macros.<PluginId>.json`. The helpers only the plugins call are never offered. Technicians and administrators see the second group; the others are told it is left out. With an older service only your own macros are listed, and the form says so. Install WorkshopService first.
+- "View content" shows the chosen macro read-only in a dialog of its own; nothing opens a macro in the editor or the viewer of DWC.
+- A button that runs a macro builds its M98 line through one check: a path that leaves its folder or breaks out of the quotes is not sent (the button says the macro is missing).
+- "Shown ON when / custom object model path": the path is suggested while typing from the live object model and checked against it ("that path does not exist", "that path is a group"), the value is checked against what the path holds (true/false, number), a Test row shows what the path is worth now and whether the button would show ON, and ONE fold of help says what it takes (a dotted path, for example `state.status`, `global.light`, `move.axes[0].homed`) and what values it accepts. Paths with `[n]` now work.
+
+## 2.8.3 -- 2026-11-22
+
+- Rebuild with shared update: start-up card split into modules, neutral Spanish texts, service texts resynced, unused .wf-index rule dropped
+
+## 2.8.2 -- 2026-11-22
+
+- Tuteo in texts (no voseo in es.json).
+
+## 2.8.1 -- 2026-11-22
+
+- Visual review round: single hover and focus for inputs and controls (family styles), 44 px switch and checkbox rows, range picker field 44 px.
+
+## 2.8.0 -- 2026-11-21
+
+- Style unification: 44 px rail and controls, nothing under 12 px, dialog layers stop at the bar edge, one session notice, every double touch takes the family 4000 ms constant, role notice with the family wording, updated shared family styles.
+
+## 2.7.57 -- 2026-11-21
+
+- Controls panel: one lock inside each blocked control with the short cause visible (no column of locks), one session note per block, Mode CNC/FFF blocked buttons show lock and cause, buttons 44 px
+
+## 2.7.56 -- 2026-11-21
+
+- Help card readable (own text color and font), one session notice per page, no repeated asks for missing optional files; Jog pendant press feedback and tap-again confirmations; Vision silent on closed connection
+
+## 2.7.55 -- 2026-11-21
+
+- Session notice stacked on narrow panels, dimmed parts named, camera window buttons consistent
+
 ## 2.7.54 -- 2026-11-18
 
 - accessRev: the page asks whoami at once when the service says the access changed
@@ -66,7 +143,7 @@
 
 ## 2.7.38 -- 2026-11-11
 
-- Owner report 2026-11-11: shutdown without session, kiosk PIN pad, hive confirm color, wheel release and Z keys, version in every page bar
+- User report 2026-11-11: shutdown without session, kiosk PIN pad, hive confirm color, wheel release and Z keys, version in every page bar
 
 ## 2.7.37 -- 2026-11-10
 

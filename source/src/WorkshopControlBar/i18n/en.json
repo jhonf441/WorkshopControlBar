@@ -8,8 +8,19 @@
 		"control_bar": "Control bar"
 	},
 	"sidebar": {
-		"locked_needs_session": "The dimmed parts need you to sign in.",
-		"locked_needs_role": "The dimmed parts require another role. Your role: {role}. Ask an administrator for access.",
+		"locked_needs_session": "Need a session: {parts}.",
+		"locked_more": "and {n} more",
+		"part_notice": "Phone alerts",
+		"part_notice_settings": "Alert settings",
+		"part_power": "Shut down",
+		"part_power_method": "Shut-down method",
+		"part_power_when_done": "Shut down when done",
+		"part_power_timer": "Timer",
+		"part_power_restart": "Restart everything",
+		"part_power_now": "Shut down now",
+		"lock_short_session": "Needs a session",
+		"lock_short_role": "{role} only",
+		"locked_needs_role": "Your role ({role}) cannot use: {parts}.",
 		"signed_out_login": "No session · Sign in",
 		"confirm": "Confirm",
 		"turn_off_in_timer": "Turn off in... (timer)",
@@ -50,7 +61,7 @@
 		"arrange_hint": "Arrange: drag by the grip dots. Sections move among themselves; each card within its section. Tap Done to finish.",
 		"this_screen_help": "Open/close floating panels on THIS screen. They don't stop any process or affect other users or screens.",
 		"no_panels_installed": "No panels installed.",
-		"global_machine": "GLOBAL - MACHINE",
+		"global_machine": "Global · machine",
 		"global_help": "They act on the machine and the system: they affect ALL connected people and screens.",
 		"phone_notifications": "Phone notifications",
 		"settings_ellipsis": "Settings...",
@@ -124,7 +135,7 @@
 		"live_stop_done": "Job stopped safely: no more lines get in."
 	},
 	"common": {
-		"this_screen": "THIS SCREEN",
+		"this_screen": "This screen",
 		"close": "Close",
 		"save": "Save",
 		"cancel": "Cancel",
@@ -142,13 +153,13 @@
 	},
 	"hidden": {
 		"nothing_scheduled": "Nothing scheduled",
-		"armed_when_the_job_ends": "Armed: when the job ends",
+		"armed_when_the_job_ends": "Shuts down when the job ends",
 		"no_data": "No data",
 		"disconnected": "Disconnected",
 		"machine_off": "Off",
 		"shuts_down_the_system_and_cuts": "Shuts down the system and cuts the power (GLOBAL). Asks for confirmation first.",
-		"global_affects_everyone": "GLOBAL · AFFECTS EVERYONE",
-		"my_buttons": "MY BUTTONS",
+		"global_affects_everyone": "Global · affects everyone",
+		"my_buttons": "My buttons",
 		"back": "Back",
 		"notifications": "Alerts",
 		"all": "All",
@@ -162,7 +173,7 @@
 		"halted": "Stopped",
 		"muted": "Muted",
 		"active": "Active",
-		"scheduled_at": "Scheduled: {time}"
+		"scheduled_at": "Shuts down at {time}"
 	},
 	"order": {
 		"show_all": "Show all",
@@ -312,7 +323,7 @@
 		"factory_looking": "Looking for the factory macros...",
 		"factory_added": "Added {n} factory buttons.",
 		"factory_none": "Nothing to add: no factory macro exists yet, or its buttons are already there. Create the macros from the Start-up card.",
-		"buttons_caps": "BUTTONS",
+		"buttons_caps": "Buttons",
 		"buttons_section_help": "Custom macros and G-code, grouped by function. They act on the machine (all screens). Grey ones with a dotted border can't be used now (the reason is shown below).",
 		"label_error": "{label}: error {error}"
 	},

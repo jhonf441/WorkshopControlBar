@@ -12,12 +12,12 @@
       var SB_OPEN_DOT = "#69f0ae"; // the live dot, 4:1 against the fill (a graphic needs 3)
       var SB_OPEN_BTN = "#ffffff"; // the "Close" button on a filled card: white with dark text, 9:1
       var SB_OPEN_BTN_TEXT = "#0d47a1";
-      var SB_OPEN_TOUCH = 44; // px: what a finger needs (height of the rail icon and of the buttons that open and close a panel)
+      var SB_OPEN_TOUCH = 32; // px: the rail icon and the open / close buttons of a panel, 32 to the eye with a 40 px area (class sb-hit, 10-sidebar-scale.js)
       var SB_OPEN_STYLE_ID = "workshop-bar-open-css"; // listed in BAR_OWN_STYLES (20-main.js): it leaves the page when the plugin stops
 
       // What a panel's state() answered, as the painters read it. A closing panel (busy, not open any more) is still on the screen, so it keeps
       // the open look until it is gone; `kind` is the word the badge says: open, busy (the panel's own text), locked or closed.
-      // `locked` (owner rule 2026-11-06): a panel that cannot be OPENED by this person because it needs a session ({ kind: "session" }) or a role
+      // `locked` (project rule 2026-11-06): a panel that cannot be OPENED by this person because it needs a session ({ kind: "session" }) or a role
       // ({ kind: "role", needed: "<role id>" }) is not opened: its launchers show a lock and the reason, and the tap signs in (or changes the
       // person) instead of opening. A panel that is already open is not locked by this (the panel itself blocks its content in place).
       function sbOpenView(st) {
@@ -36,11 +36,43 @@
       function sbOpenLockAction(lk) {
         return i18nT(lk.kind === "session" ? "sidebar.panel_locked_sign_in" : "sidebar.panel_locked_change_role");
       }
-      // The tap on a locked launcher: the name + PIN dialog (a sign-in, or another person). Nothing opens.
-      function sbOpenLockTap() {
+      // The tap on a locked launcher: the name + PIN dialog (a sign-in, or another person). Nothing opens while it is locked; once the PIN is
+      // accepted the panel the person asked for opens by itself (owner 2026-11-23, note 10: "after the PIN the panel does not open, I have to tap
+      // again"): the tap was the person's intent, the PIN only unlocked it. The state is asked again first: a role that is still too low opens nothing.
+      // A panel that rebuilds itself on a change of person opts in with its own openAfterSignIn(); without it the panel's toggle is used.
+      function sbOpenLockTap(p) {
         // 2026-11-18: the bar folds first, so the dialog (outside the bar) does not find it open and the first PIN digit does not close it
         if (typeof sidebarSetCollapsed === "function") sidebarSetCollapsed(true);
-        if (typeof workshopLogin === "function") workshopLogin();
+        if (typeof workshopLogin !== "function") return;
+        // the permissions of the new person can arrive a moment after the PIN: workshopLoginThen asks again for up to 3 s (sbOpenAfterLogin opens and says so)
+        if (typeof workshopLoginThen === "function") {
+          workshopLoginThen(function () { return sbOpenAfterLogin(p, true); });
+          return;
+        }
+        var asked = workshopLogin();
+        if (asked && typeof asked.then === "function") asked.then(function (ok) { sbOpenAfterLogin(p, ok); }, function () {});
+      }
+      // PURE but for the panel: after a sign-in (ok) open the panel when it is now closed and not locked. Returns true when it opened it.
+      function sbOpenAfterLogin(p, ok) {
+        if (!ok || !p) return false;
+        if (typeof p.openAfterSignIn === "function") {
+          try {
+            return p.openAfterSignIn() !== false;
+          } catch (e) {
+            return false;
+          }
+        }
+        if (typeof p.toggle !== "function" || p.rebuildsOnSignIn) return false;
+        var st = {};
+        try {
+          st = (typeof p.state === "function" && p.state()) || {};
+        } catch (e) {
+          return false;
+        }
+        var v = sbOpenView(st);
+        if (v.on || v.locked || v.disabled) return false;
+        p.toggle();
+        return true;
       }
       // What a launcher does when tapped: the lock dialog for a locked panel, else the panel's own toggle. Returns true when it was the lock.
       function sbOpenTap(p) {
@@ -51,7 +83,7 @@
           st = {};
         }
         if (sbOpenView(st).locked) {
-          sbOpenLockTap();
+          sbOpenLockTap(p);
           return true;
         }
         if (p && typeof p.toggle === "function") p.toggle();

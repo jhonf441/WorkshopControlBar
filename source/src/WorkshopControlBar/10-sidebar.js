@@ -34,7 +34,7 @@
       var SIDEBAR_ID = "emergency-fab-sidebar";
       var SIDEBAR_TOGGLE_ID = "emergency-fab-sidebar-toggle";
       var SIDEBAR_COLLAPSED_KEY = "emergencyFabSidebarCollapsed";
-      var SIDEBAR_RAIL_W = 44;
+      var SIDEBAR_RAIL_W = 44; // family redesign, batch 1 (2026-11-23, FAMILIA-REDISENO.md 2): 32 px icons with a 40 px area; the section is a colour line, not a word
       var SIDEBAR_EXPANDED_W = 300;
       var SIDEBAR_LOCAL_COLOR = "#42a5f5";
       var SIDEBAR_GLOBAL_COLOR = "#ff9800";
@@ -126,7 +126,7 @@
         sbT(b, label);
         b.style.cssText = [
           "flex:1 1 auto",
-          "min-height:" + (window.matchMedia && window.matchMedia("(pointer: coarse)").matches === true ? 44 : 34) + "px", // 44 px on a touch screen
+          "min-height:var(--wf-size-s, 32px)", // the scale of the family (2026-11-23): 32 to the eye, 40 to the finger (10-sidebar-scale.js); the stops stay 48
           "padding:6px 8px",
           "border-radius:6px",
           "border:1px solid rgba(255,255,255,0.35)",
@@ -153,7 +153,7 @@
       function sbText(text, css) {
         var d = document.createElement("div");
         sbT(d, text);
-        d.style.cssText = css || "font-size:11px;line-height:1.35;color:rgba(255,255,255,0.7);";
+        d.style.cssText = css || "font-size:12px;line-height:1.35;color:rgba(255,255,255,0.7);";
         if (!css) d.dataset.sbHelp = "1"; // explanation text: the compact mode hides it
         return d;
       }
@@ -225,10 +225,10 @@
           ";background:rgba(255,255,255,0.04);border-radius:0 8px 8px 0;padding:8px 8px 10px 10px;display:flex;flex-direction:column;gap:10px;";
         g.dataset.sbGroup = "1";
         g.style.setProperty("--sb-c", color); // Hidden style: color of the label and of the icons
-        var h = sbText(title, "font-size:12px;font-weight:bold;letter-spacing:0.08em;color:" + color + ";");
+        var h = sbText(title, "font-size:12px;font-weight:600;letter-spacing:0;color:" + color + ";"); // 12/600 in sentence case, in the colour of its section
         g.appendChild(h);
         if (scopeText) {
-          var alc = sbText(scopeText, "font-size:11px;line-height:1.35;color:rgba(255,255,255,0.85);");
+          var alc = sbText(scopeText, "font-size:12px;line-height:1.35;color:rgba(255,255,255,0.85);");
           alc.dataset.sbHelp = "1";
           g.appendChild(alc);
         }
@@ -272,14 +272,15 @@
       }
 
       function sbStatusLine(card) {
-        var s = sbMsgLine("font-size:11px;font-weight:bold;");
+        var s = sbMsgLine("font-size:12px;font-weight:bold;");
         card.appendChild(s);
         return s;
       }
 
       function sbRow(card) {
         var r = document.createElement("div");
-        r.style.cssText = "display:flex;gap:6px;flex-wrap:wrap;";
+        r.dataset.sbRow = "1"; // a row of the family: 48 high, a line between rows (10-sidebar-scale.js)
+        r.style.cssText = "display:flex;gap:var(--wf-gap-hit, 8px);flex-wrap:wrap;align-items:center;min-height:var(--wf-row, 48px);";
         card.appendChild(r);
         return r;
       }
@@ -295,12 +296,14 @@
       function sbMakeRailBtn(iconName, title, targetKey, onTap) {
         var b = document.createElement("button");
         b.type = "button";
+        b.dataset.sbRail = "1"; // round icon: the lock of a locked part is not drawn inside it (09-role.js)
         b.title = title;
-        sbH(b, sbIconSvg(iconName, 22, false));
+        sbH(b, sbIconSvg(iconName, 18, false));
+        b.className = "sb-hit"; // 32 px to the eye, 40 px to the finger (::before of the scale, 10-sidebar-scale.js)
         b.style.cssText = [
           "position:relative",
-          "width:36px",
-          "height:36px",
+          "width:var(--wf-size-s, 32px)",
+          "height:var(--wf-size-s, 32px)",
           "flex:none",
           "border-radius:8px",
           "border:1px solid rgba(255,255,255,0.25)",
@@ -338,11 +341,15 @@
         return b;
       }
 
+      // the section in the 44 px rail: a line of its colour (LOCAL blue, GLOBAL orange), the word for the screen reader and the tooltip
       function sbRailCaption(text, color) {
-        return sbText(
-          text,
-          "font-size:10px;font-weight:bold;letter-spacing:0.04em;color:" + color + ";text-align:center;width:100%;margin-top:4px;"
-        );
+        var c = document.createElement("div");
+        c.dataset.sbRailCaption = "1";
+        c.title = text;
+        c.setAttribute("role", "separator");
+        c.setAttribute("aria-label", text);
+        c.style.cssText = "width:24px;height:3px;border-radius:2px;margin:6px 0 2px;flex:none;background:" + color + ";";
+        return c;
       }
 
       // The bar never changes DWC's layout: it only floats over the page. It
@@ -368,8 +375,28 @@
       // Perf (measured on the kiosk, 2026-10-28): the margin is set inline on #app and the page color inline on html/body. A CSS variable on
       // <html> invalidates the style of every element of DWC and a margin transition re-lays out the whole page on every frame: on the Pi
       // that made closing and opening the bar take seconds. Now it is one relayout, no animation.
+      // Dialogs (the family's wf-veil sheets and Vuetify's v-dialog) are centered in the window, but the bar sits above every layer (z-index max, so the
+      // emergency stop stays reachable): on a phone the rail covered the right edge of the dialog and cut its text (QA r2, A-04). While the bar is on
+      // screen the dialog layers stop at its left edge instead: one <style> element changed only when the footprint changes (no CSS variable on <html>).
+      var sbModalClearLast = -1;
+      function sbApplyModalClear() {
+        var w = 0;
+        if (!pluginStopped && sidebarEl && !(sidebarCollapsed && sbClosedArrow())) w = Math.max(0, Math.ceil(document.documentElement.clientWidth - sidebarEl.getBoundingClientRect().left));
+        // the REAL width the bar takes on screen (rail or open, reserved or floating; 0 as an arrow) goes to the notices center, whose veils and cards
+        // stop at it (workshopVeilClear): no veil may cover the stop of the bar (10-sidebar-place.js)
+        sbNoticeInset(w);
+        if (w > 0 && window.innerWidth - w < 280) w = 0; // an open bar that leaves no room: the Vuetify dialog keeps the whole window
+        if (w === sbModalClearLast) return;
+        sbModalClearLast = w;
+        var st = document.getElementById("workshop-bar-modal-clear");
+        if (!w) { if (st) st.remove(); return; }
+        if (!st) { st = document.createElement("style"); st.id = "workshop-bar-modal-clear"; document.head.appendChild(st); }
+        st.textContent = ".wf-veil{right:" + w + "px!important}.v-dialog__content{width:calc(100% - " + w + "px)!important}";
+      }
+
       var sbPushLast = 0;
       function sbApplyPush() {
+        sbApplyModalClear();
         var r = pluginStopped || !sidebarEl ? 0 : workshopSidebarReserve(sbConfig.pushPage, sidebarCollapsed, sbConfig.closed, window.innerWidth, SIDEBAR_RAIL_W, SIDEBAR_EXPANDED_W, 16);
         if (r === sbPushLast) return;
         var app = document.getElementById("app");
@@ -430,6 +457,7 @@
         sidebarEl.style.setProperty("--tp-sb-bottom", bottom + "px");
         if (sbHidden.zone) sbHidden.zone.style.top = top + "px";
         if (sbHidden.tab) sbHidden.tab.style.top = Math.round(top + (window.innerHeight - top) / 2) + "px";
+        if (sbScrim) sbScrim.style.top = top + "px";
         sbHidden.top = top;
       }
 
@@ -502,9 +530,13 @@
         window.addEventListener("resize", sbOcultaUbicar);
         window.addEventListener("resize", sbPlace);
         window.addEventListener("resize", sbApplyPush);
+        window.addEventListener("resize", sbSheetApply);
         window.addEventListener("orientationchange", sbPlace);
         if (window.visualViewport) window.visualViewport.addEventListener("resize", sbPlace);
-        setInterval(sbOcultaUbicar, 2000); // the scrollbar appears / disappears when the page changes
+        // the scrollbar appears / disappears when the page changes: the root box gets narrower and the ResizeObserver of the placement says so
+        // after the browser's own layout (note 15); without a ResizeObserver, the old poll every 2 s
+        sbHidden.rootCheck = sbOcultaUbicar;
+        if (!sbPlaceWatchStart()) setInterval(sbOcultaUbicar, 2000);
         // mouse: leaving the bar hides it (except gear or order open)
         sidebarEl.addEventListener("pointerenter", function () { clearTimeout(sbHidden.timer); });
         sidebarEl.addEventListener("pointerleave", function (ev) {
@@ -535,48 +567,8 @@
           sidebarSetCollapsed(true);
           // the tap that closes the bar must not also act on what is under the finger (a switch, a button):
           // swallow the click that follows this touch
-          var comer = function (e) {
-            document.removeEventListener("click", comer, true);
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-          };
-          document.addEventListener("click", comer, true);
-          setTimeout(function () { document.removeEventListener("click", comer, true); }, 800);
+          sbSwallowNextClick();
         }, true);
-      }
-
-      // Own look of the Hidden style (2026-10-10: "I want a style change
-      // also with respect to v1"): floating panel separated from the edge,
-      // rounded corners, translucent background; sections with a colored label
-      // (not the side stripe) and cards with the icon in a box of the
-      // color of their section. CSS only on the same nodes: the Classic one does not change.
-      function sbHiddenCss() {
-        if (document.getElementById("workshop-bar-hidden-css")) return;
-        var B = "#" + SIDEBAR_ID;
-        var st = document.createElement("style");
-        st.id = "workshop-bar-hidden-css";
-        st.textContent = [
-          B + "{top:var(--tp-sb-top,10px)!important;bottom:var(--tp-sb-bottom,10px)!important;right:10px!important;border-radius:16px!important;border:1px solid rgba(255,255,255,0.14)!important;background:#1e272c!important;box-shadow:0 12px 40px rgba(0,0,0,0.65)!important;}",
-          B + ">div:first-child{background:transparent!important;border-bottom:1px solid rgba(255,255,255,0.08)!important;padding:8px 10px!important;}",
-          // closed as a rail (44 px): only the toggle fits, centred (the gear and title are hidden)
-          B + '[data-sb-closed="1"]>div:first-child{padding:8px 0!important;justify-content:center!important;gap:0!important;}',
-          B + " [data-sb-group]{border-left:none!important;border-radius:12px!important;background:transparent!important;padding:2px 0 6px 0!important;gap:8px!important;}",
-          B + " [data-sb-group]>div:first-child{align-self:flex-start;padding:3px 10px;border-radius:999px;font-size:11px!important;background:color-mix(in srgb,var(--sb-c) 18%,transparent);}",
-          B + " [data-sb-card]{background:rgba(255,255,255,0.05)!important;border:1px solid rgba(255,255,255,0.08);border-radius:12px!important;padding:10px!important;}",
-          B + " [data-sb-card]>div:first-child>span:first-child{display:inline-flex;width:28px;height:28px;flex:none;border-radius:8px;align-items:center;justify-content:center;background:color-mix(in srgb,var(--sb-c,#42a5f5) 22%,transparent);}",
-          B + " [data-sb-card] button{border-radius:10px!important;border-color:rgba(255,255,255,0.16)!important;}",
-          // DWC light theme (2026-10-10: "the controls in hidden mode do not
-          // have light mode right"): these rules go with !important and
-          // 03-theme.js only converts the inline colors; the light version goes
-          // here, with the light palette of DESIGN.md (html.tp-bright is set by 03-theme.js)
-          "html.tp-bright " + B + "{background:#ffffff!important;border-color:rgba(0,0,0,0.12)!important;box-shadow:0 12px 32px rgba(0,0,0,0.22)!important;}",
-          "html.tp-bright " + B + ">div:first-child{border-bottom-color:rgba(0,0,0,0.08)!important;}",
-          "html.tp-bright " + B + " [data-sb-card]{background:#f5f7f8!important;border-color:rgba(0,0,0,0.08);}",
-          "html.tp-bright " + B + " [data-sb-card] button{border-color:rgba(0,0,0,0.16)!important;}",
-          "html.tp-bright " + B + " [data-sb-group]>div:first-child{background:color-mix(in srgb,var(--sb-c) 14%,#ffffff);}",
-        ].join("\n");
-        document.head.appendChild(st);
       }
 
       // The arrow of the closed bar: the tab at the edge ("arrow" mode) or the "<" button of the rail ("rail" mode); null while it is not shown
@@ -601,16 +593,18 @@
           /* no critico */
         }
         if (!sidebarEl) return;
-        sidebarEl.style.width = sbWidthCss(c);
+        sidebarEl.style.width = c ? sbWidthCss(true) : sbOpenWidthCss(); // a sheet of at most 88 % on a small screen (note 16)
         // closed = "arrow": off screen (only the tab); closed = "rail": the rail
         var oculta = sbClosedArrow();
         sb.rail.style.display = c && !oculta ? "flex" : "none";
         sb.full.style.display = c ? "none" : "flex";
         sbHiddenArm();
         sbHiddenCss();
+        sbScaleCss(); // the scale of the family, after the Hidden style (10-sidebar-scale.js)
         sbPlace();
         sbApplyPush();
-        sidebarEl.style.transition = "transform 0.18s ease";
+        sbScrimPaint();
+        sidebarEl.style.transition = "none"; // no slide when the bar opens or closes (owner, 2026-11-23)
         sidebarEl.style.transform = oculta && c ? "translateX(calc(100% + 24px))" : "";
         if (sbHidden.zone) sbHidden.zone.style.display = oculta && c ? "block" : "none";
         if (sbHidden.tab) sbHidden.tab.style.display = oculta && c ? "block" : "none";
@@ -700,7 +694,7 @@
         // The bar's OWN version (PLUGIN_VERSION, injected by build.py), written once: it never changes while the page lives. Only its own:
         // the line used to list every workshop plugin loaded in the page (workshop.versions), so the bar seemed to carry the Workbench's or
         // the Jog's version; the version of each plugin is DWC's Plugins page's business.
-        sb.versions = sbText(i18nT('sidebar.version', { version: PLUGIN_VERSION }), "font-size:10px;line-height:1.4;color:rgba(255,255,255,0.45);padding:0 4px;");
+        sb.versions = sbText(i18nT('sidebar.version', { version: PLUGIN_VERSION }), "font-size:12px;line-height:1.4;color:rgba(255,255,255,0.45);padding:0 4px;");
         full.appendChild(sb.versions);
 
         sbPanelUi = {};
@@ -787,9 +781,14 @@
         if (typeof ocRefresh === "function") ocRefresh(); // estilo Oculta (11-hidden.js)
       }
 
-      // The bar sits below DWC's top app-bar: re-measure now and then (the app-bar
-      // can change height without a resize event).
+      // The bar sits below DWC's top app-bar, which can change height without a resize event: the ResizeObserver above re-places it; this slow
+      // timer only attaches the observer to bars DWC built since (no layout read) and checks the frame rule. Without ResizeObserver: the old
+      // measure every second.
+      var sbPlaceWatching = sbPlaceWatchStart();
       setInterval(function () {
-        if (!pluginStopped && sidebarEl) sbPlace();
+        if (sbModalClearLast >= 0) sbNoticeInset(sbModalClearLast); // a notices center that arrived after the bar gets its footprint
+        if (sbPlaceWatching) {
+          if (!document.hidden) sbPlaceObserve();
+        } else if (!pluginStopped && sidebarEl) sbPlace();
         sbYieldToParentBar(); // 10-sidebar-guard.js
-      }, 1000);
+      }, sbPlaceWatching ? 3000 : 1000);

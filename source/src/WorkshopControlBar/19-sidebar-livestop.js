@@ -25,6 +25,8 @@
         var title = sbText("", "flex:1 1 0;font-size:12px;font-weight:600;color:#ffe0b2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;");
         strip.appendChild(title);
         sb.liveStopBtn = sbMakeButton("", "transparent", sbLiveStopRun);
+        sb.liveStopBtn.dataset.sbCritical = "1"; // a stop: 48 px, never the compact scale (10-sidebar-scale.js)
+        sb.liveStopBtn.style.minHeight = "var(--wf-hit-critical, 48px)";
         var icon = document.createElement("span");
         icon.style.cssText = "display:inline-flex;";
         icon.innerHTML = sbIconSvg(SB_LIVESTOP_ICON, 18, false);
@@ -34,7 +36,7 @@
         sb.liveStopBtn.title = i18nT('sidebar.live_stop_tip');
         sb.liveStopBtn.setAttribute("aria-label", i18nT('sidebar.live_stop_button'));
         strip.appendChild(sb.liveStopBtn);
-        sb.liveStopMsg = sbMsgLine("flex:1 1 100%;font-size:11px;color:var(--wf-n-down-text,#ffe082);");
+        sb.liveStopMsg = sbMsgLine("flex:1 1 100%;font-size:12px;color:var(--wf-n-down-text,#ffe082);");
         strip.appendChild(sb.liveStopMsg);
         bar.appendChild(strip);
         sb.liveStopStrip = strip;

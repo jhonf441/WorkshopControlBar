@@ -161,7 +161,7 @@
           sbTimingArmed.btn.style.background = "#455a64";
         }
         sbT(btn, i18nT('sidebar.confirm'));
-        btn.style.background = "#b71c1c";
+        btn.style.background = "#c62828"; // a confirmation that shuts down: the error fill (the darker emergency red is only for the emergency stop)
         sbTimingArmed = {
           min: min,
           btn: btn,
@@ -169,7 +169,7 @@
             sbT(btn, btn.dataset.timingLabel || i18nT('sidebar.schedule'));
             btn.style.background = "#455a64";
             sbTimingArmed = null;
-          }, 4000),
+          }, SB_ARM_MS),
         };
         sbTimingMsg = i18nT('sidebar.tap_again_to_shut_down_in', { t: min >= 60 && min % 60 === 0 ? min / 60 + " h" : min + " min" });
         sidebarRefresh();

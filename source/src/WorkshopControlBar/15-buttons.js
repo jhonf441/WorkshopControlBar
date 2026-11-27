@@ -1,4 +1,5 @@
       // ---- Own buttons (replacement for BtnCmd) ----
+      var SB_ARM_MS = 4000; // = WORKSHOP_ARM_MS (src/_shared/00-arm.js); tests/arm-ms.test.js keeps them equal // how long a first tap stays armed (here and in 19-sidebar-actions.js)
       //
       // Request 2026-10-08: BtnCmd was freezing (it could not be restarted, its gear
       // did not show up) and was uninstalled; its buttons now live in
@@ -241,7 +242,8 @@
       var btnArmed = ""; // key of the button waiting for the second tap
       var btnArmTimer = null;
       var btnMachineMode = null;
-      var btnMacroList = null; // rutas relativas a 0:/macros (para elegir)
+      var btnMacroList = null; // the actions the catalogue offers (workshopMacroActions): paths relative to 0:/macros and "plugin:<path>"
+      var btnMacroCat = null; // what the service answered (macros.catalog): { ok, mine, plugins, hidden }; null until it is read
       var btnCollapsed = {};
       try {
         btnCollapsed = JSON.parse(localStorage.getItem(BUTTONS_COLLAPSED_KEY) || "{}") || {};
@@ -349,27 +351,12 @@
           .then(btnRender);
       }
 
-      // List of macros to choose from in the form (recursive, without .bak).
+      // The macros to choose from in the form: the service's catalogue (macros.catalog, 07-macro-catalog.js): the person's own and the ones the
+      // plugins offer to be called. The helpers only the plugins call are not in it.
       function btnLoadMacros() {
-        var out = [];
-        function walk(dir) {
-          return fetch("/machine/directory/" + encodeURI("0:/macros/" + dir), { cache: "no-store" })
-            .then(function (r) {
-              return r.ok ? r.json() : [];
-            })
-            .then(function (items) {
-              var subs = [];
-              items.forEach(function (it) {
-                var p = dir + it.name;
-                if (it.type === "d") subs.push(walk(p + "/"));
-                else if (/\.g$/i.test(it.name)) out.push(p);
-              });
-              return Promise.all(subs);
-            })
-            .catch(function () {});
-        }
-        return walk("").then(function () {
-          btnMacroList = out.sort();
+        return workshopMacroCatalogLoad().then(function (cat) {
+          btnMacroCat = cat;
+          btnMacroList = workshopMacroActions(cat);
           btnRender();
         });
       }
@@ -389,7 +376,9 @@
       // A button that was saved while its macro existed must not look usable after the macro is gone (SD-LAYOUT.md B.3 row 5).
       function btnMacroMissing(b) {
         if (!b || b.kind !== "macro" || !b.action || !btnMacroList || !btnMacroList.length) return false;
-        return btnMacroList.indexOf(String(b.action).replace(/^\/+/, "")) < 0;
+        var rel = String(b.action).replace(/^\/+/, "");
+        if (rel.indexOf("plugin:") === 0 && !btnMacroList.pluginsVisible) return false; // a role that cannot read the plugin group cannot tell
+        return btnMacroList.indexOf(rel) < 0;
       }
 
       function btnBlockReason(b) {
@@ -426,7 +415,7 @@
         btnArmTimer = setTimeout(function () {
           btnArmed = "";
           btnRender();
-        }, 4000);
+        }, SB_ARM_MS);
         btnRender();
         return false;
       }
@@ -443,7 +432,13 @@
           return;
         }
         if (b.confirm && !btnArm("run:" + gi + ":" + i)) return;
-        var code = b.kind === "macro" ? 'M98 P"0:/macros/' + b.action.replace(/^\/+/, "") + '"' : b.action;
+        var code = workshopMacroCode(b); // M98 for a macro (a path that leaves its folder gives ""), the text for a G-code
+        if (!code) {
+          btnMsg = b.label + ": " + i18nT('buttons.macro_missing', { macro: b.action });
+          btnMsgGroup = g.id;
+          btnRender();
+          return;
+        }
         btnMsg = b.label + i18nT('buttons.sent');
         btnMsgGroup = g.id;
         btnRender();
@@ -480,14 +475,14 @@
       }
 
       var BTN_INPUT_CSS =
-        "width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:#263238;color:#fff;border:1px solid rgba(255,255,255,0.35);border-radius:4px;padding:5px;font-size:12px;";
+        "width:100%;max-width:100%;min-width:0;background:#263238;color:#fff;"; // size, border and radius come from workshopInputEl (class wf-input)
 
       function btnSmall(label, bg, onClick) {
         var b = sbMakeButton(label, bg, onClick);
         b.style.flex = "none";
-        b.style.minHeight = "28px";
+        b.style.minHeight = "44px";
         b.style.padding = "3px 7px";
-        b.style.fontSize = "11px";
+        b.style.fontSize = "12px";
         return b;
       }
 
@@ -496,7 +491,7 @@
         form.appendChild(btnEl("div", "font-size:12px;font-weight:bold;", title));
         form._field = function (label, input) {
           var d = btnEl("div", "display:flex;flex-direction:column;gap:2px;");
-          d.appendChild(btnEl("label", "font-size:11px;color:rgba(255,255,255,0.75);", label));
+          d.appendChild(btnEl("label", "font-size:12px;color:rgba(255,255,255,0.75);", label));
           d.appendChild(input);
           form.appendChild(d);
         };
@@ -504,7 +499,7 @@
       }
 
       function btnTextInput(obj, key, max, multiline) {
-        var inp = btnEl(multiline ? "textarea" : "input", BTN_INPUT_CSS + (multiline ? "min-height:54px;" : ""));
+        var inp = workshopInputEl(multiline ? "textarea" : "input", BTN_INPUT_CSS + (multiline ? "min-height:54px;" : ""));
         inp.value = obj[key] || "";
         if (max) inp.maxLength = max;
         inp.addEventListener("input", function () {
@@ -514,7 +509,7 @@
       }
 
       function btnFormButtons(form, onSave) {
-        var err = btnEl("div", "font-size:11px;color:#ef9a9a;");
+        var err = btnEl("div", "font-size:12px;color:#ef9a9a;");
         form.appendChild(err);
         var row = btnEl("div", "display:flex;gap:6px;flex-wrap:wrap;");
         row.appendChild(
@@ -536,7 +531,7 @@
         var f = btnForm.data;
         var form = btnFormBox(btnForm.g < 0 ? i18nT('buttons.new_group') : i18nT('buttons.edit_group'));
         form._field(i18nT('buttons.title'), btnTextInput(f, "title", 40));
-        var sel = btnEl("select", BTN_INPUT_CSS);
+        var sel = workshopInputEl("select", BTN_INPUT_CSS);
         Object.keys(BTN_ICON_NAMES).forEach(function (k) {
           var op = btnEl("option", null, BTN_ICON_NAMES[k]);
           op.value = k;
@@ -581,7 +576,7 @@
         var form = btnFormBox(btnForm.i < 0 ? i18nT('buttons.new_button') : i18nT('buttons.edit_button'));
         form._field(i18nT('buttons.button_text'), btnTextInput(f, "label", 40));
 
-        var selG = btnEl("select", BTN_INPUT_CSS);
+        var selG = workshopInputEl("select", BTN_INPUT_CSS);
         btnData.groups.forEach(function (g, gi) {
           var op = btnEl("option", null, g.title);
           op.value = gi;
@@ -593,7 +588,7 @@
         });
         form._field(i18nT('buttons.group'), selG);
 
-        var selKind = btnEl("select", BTN_INPUT_CSS);
+        var selKind = workshopInputEl("select", BTN_INPUT_CSS);
         [["macro", i18nT('buttons.run_a_macro')], ["gcode", i18nT('buttons.send_g_code')]].forEach(function (o) {
           var op = btnEl("option", null, o[1]);
           op.value = o[0];
@@ -607,22 +602,7 @@
         form._field(i18nT('buttons.what_it_does'), selKind);
 
         if (f.kind === "macro") {
-          var inAction = btnEl("select", BTN_INPUT_CSS);
-          var list = (btnMacroList || []).slice();
-          if (f.action && list.indexOf(f.action) < 0) list.unshift(f.action);
-          var op0 = btnEl("option", null, btnMacroList ? i18nT('buttons.choose_macro') : i18nT('buttons.loading_macros'));
-          op0.value = "";
-          inAction.appendChild(op0);
-          list.forEach(function (p) {
-            var op = btnEl("option", null, p);
-            op.value = p;
-            if (p === f.action) op.selected = true;
-            inAction.appendChild(op);
-          });
-          inAction.addEventListener("change", function () {
-            f.action = inAction.value;
-          });
-          form._field(i18nT('buttons.macro_macros_folder'), inAction);
+          btnFormMacroField(form, f);
         } else {
           var ta = btnTextInput(f, "action", 0, true);
           ta.style.fontFamily = "monospace";
@@ -647,7 +627,7 @@
         form._field(i18nT('buttons.active_in_modes_help'), modesRow);
 
         // Estado: cuando mostrarlo ENCENDIDO (ver BTN_STATES)
-        var selE = btnEl("select", BTN_INPUT_CSS);
+        var selE = workshopInputEl("select", BTN_INPUT_CSS);
         var curKey = "";
         if (f.state) {
           curKey = "custom";
@@ -680,20 +660,7 @@
           btnRender();
         });
         form._field(i18nT('buttons.shown_on_active_when'), selE);
-        if (curKey === "custom") {
-          if (!f.state) f.state = { path: "", value: "" };
-          var cr = btnTextInput(f.state, "path", 120);
-          cr.placeholder = i18nT('buttons.eg_path');
-          form._field(i18nT('buttons.path'), cr);
-          var cv = btnEl("input", BTN_INPUT_CSS);
-          cv.value = f.state.value === undefined ? "" : String(f.state.value);
-          cv.placeholder = i18nT('buttons.eg_value');
-          cv.addEventListener("input", function () {
-            var t = cv.value.trim();
-            f.state.value = t === "true" ? true : t === "false" ? false : t !== "" && !isNaN(Number(t)) ? Number(t) : t;
-          });
-          form._field(i18nT('buttons.value_that_means_on'), cv);
-        }
+        if (curKey === "custom") btnFormStateFields(form, f);
 
         [["confirm", i18nT('buttons.ask_for_confirmation_double_tap')], ["inJob", i18nT('buttons.can_be_used_with_a_job_running')]].forEach(function (o) {
           var l = btnEl("label", "display:flex;align-items:center;gap:6px;font-size:12px;");
@@ -757,6 +724,7 @@
 
       // Short reason (second line of the disabled button).
       function btnShortReason(b) {
+        if (btnModeBlockReason(b)) return btnModeLockShort(); // 15-buttons-mode.js: the session or the role, in two words
         if (b.modes.length && btnMachineMode && b.modes.indexOf(btnMachineMode) < 0) return i18nT('buttons.only_modes_short', { modes: b.modes.join("/") });
         if (!b.inJob && btnJobRunning()) return i18nT('buttons.not_with_a_job');
         if (!b.action) return i18nT('buttons.no_action');
@@ -774,6 +742,7 @@
 
       function btnMakeHandle(kind, gi, i, rowThe) {
         var h = btnEl("span", "flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:30px;border-radius:4px;background:rgba(255,255,255,0.1);color:#eceff1;cursor:grab;touch-action:none;");
+        h.setAttribute("data-sb-hit", "1"); // 26 x 30 drawn, 44 x 44 touched (12-order.js)
         sbH(h, sbIconSvg(BTN_DRAG_HANDLE_SVG, 18, false));
         h.title = i18nT('order.drag_to_arrange');
         h.addEventListener("pointerdown", function (ev) {
@@ -940,7 +909,7 @@
           head.appendChild(
             btnEl(
               "span",
-              "flex:0 1 auto;min-width:0;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:bold;padding:1px 6px;border-radius:9px;background:rgba(102,187,106,0.25);color:#a5d6a7;",
+              "flex:0 1 auto;min-width:0;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:bold;padding:1px 6px;border-radius:9px;background:rgba(102,187,106,0.25);color:#a5d6a7;",
               encendidos.length
                 ? encendidos
                     .map(function (b) {
@@ -975,61 +944,7 @@
         card.appendChild(grid);
         g.buttons.forEach(function (b, i) { if (!btnEditing && btnButtonUnused(b)) return; // unused mode (15-buttons-mode.js): the button is not shown
           if (!btnEditing) {
-            var reason = btnBlockReason(b);
-            var armed = btnArmed === "run:" + gi + ":" + i;
-            var bColor = btnColor(b);
-            var el = sbMakeButton("", armed ? "#ff8f00" : bColor, function () { // armado = nivel 2 (ambar)
-              btnRun(gi, i);
-            });
-            if (!armed) el.style.color = btnTextOver(bColor);
-            el.style.flex = "1 1 calc(50% - 6px)";
-            el.style.minWidth = "0";
-            el.style.overflow = "hidden";
-            el.style.display = "flex";
-            el.style.flexDirection = "column";
-            el.style.alignItems = "center";
-            el.style.justifyContent = "center";
-            var l1 = btnEl("span", "max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", armed ? i18nT('buttons.confirm_q') : b.label);
-            el.appendChild(l1);
-            // Disabled: gray, dotted border and the short reason below (before
-            // only the opacity went down and it was hard to tell which one worked).
-            var on = btnShownState(b);
-            if (on === true) {
-              // ENCENDIDO: color lleno, borde blanco grueso, brillo, punto
-              // green and "ACTIVO" (even if it cannot be tapped, e.g. the current mode).
-              el.disabled = true; // 2026-11-18: a function already in this state is not asked again (light off while off re-sent the macro)
-              el.style.position = "relative";
-              el.style.border = "2px solid #fff";
-              el.style.boxShadow = "0 0 10px " + bColor;
-              el.style.cursor = "default";
-              el.appendChild(btnEl("span", "font-size:10px;font-weight:bold;letter-spacing:0.08em;", i18nT('buttons.active_caps')));
-              el.appendChild(btnEl("span", "position:absolute;top:3px;right:4px;width:8px;height:8px;border-radius:50%;background:#69f0ae;box-shadow:0 0 4px #69f0ae;"));
-              // Mirror of the status LEDs (20-led-mirror.js): the button takes the
-              // color/animation of the state it represents while it is active
-              var led = btnLedOf(b);
-              if (led) el.dataset.ledState = led;
-            } else if (reason) {
-              el.disabled = true;
-              el.style.background = "#263238";
-              el.style.color = "rgba(255,255,255,0.45)";
-              el.style.border = "1px dashed rgba(255,255,255,0.3)";
-              el.style.cursor = "not-allowed";
-              el.style.fontWeight = "normal";
-              var l2 = btnEl("span", "font-size:11px;font-weight:normal;color:rgba(255,255,255,0.78);letter-spacing:0.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", btnShortReason(b));
-              el.appendChild(l2);
-            } else {
-              el.style.border = "1px solid rgba(255,255,255,0.55)";
-              el.style.boxShadow = "0 1px 3px rgba(0,0,0,0.5)";
-              // it has state and is NOT active: a bit dimmed on a dark background.
-              // Not with DWC's light theme: the color fill got washed out and the
-              // white text was barely readable (2026-10-10, "the bar is not right in
-              // light mode"); there it is distinguished by the lack of "ACTIVE" and of the dot.
-              if (on === false && !document.documentElement.classList.contains("tp-bright")) el.style.opacity = "0.75";
-            }
-            el.title =
-              (on === true ? i18nT('buttons.active_now') + " " : "") +
-              (reason || (b.kind === "macro" ? "Macro: " + b.action : "G-code: " + b.action) + (b.confirm ? " " + i18nT('buttons.double_tap_paren') : ""));
-            grid.appendChild(el);
+            grid.appendChild(btnMakeRunButton(gi, i, b));
             return;
           }
           var row = btnEl("div", "flex:1 1 100%;min-width:0;display:flex;align-items:center;gap:4px;");
@@ -1040,7 +955,7 @@
           row.appendChild(btnEl("span", "width:12px;height:12px;border-radius:4px;flex:none;background:" + b.color + ";"));
           var lab = btnEl("div", "flex:1 1 auto;min-width:0;display:flex;flex-direction:column;");
           lab.appendChild(btnEl("span", "font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", b.label));
-          lab.appendChild(btnEl("span", "font-size:10px;color:rgba(255,255,255,0.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", b.modes.length ? i18nT('buttons.modes_list', { modes: b.modes.join(", ") }) : i18nT('buttons.all_modes')));
+          lab.appendChild(btnEl("span", "font-size:12px;color:rgba(255,255,255,0.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;", b.modes.length ? i18nT('buttons.modes_list', { modes: b.modes.join(", ") }) : i18nT('buttons.all_modes')));
           row.appendChild(lab);
           row.appendChild(
             btnSmall(i18nT('common.edit'), "#1976d2", function () {
@@ -1066,7 +981,7 @@
           else btnRenderGroupForm(fb);
         }
 
-        if (btnMsg && btnMsgGroup === g.id) card.appendChild(sbText(btnMsg, "font-size:11px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
+        if (btnMsg && btnMsgGroup === g.id) card.appendChild(sbText(btnMsg, "font-size:12px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
         if (g.description && !btnEditing) card.appendChild(sbText(g.description));
 
         if (btnEditing && !(btnForm && btnForm.g === gi)) {
@@ -1115,7 +1030,7 @@
           } else sb.btnGroups.appendChild(fb);
           btnRenderGroupForm(fb);
         }
-        if (btnMsg && btnMsgGroup === null) sb.btnGroups.appendChild(sbText(btnMsg, "font-size:11px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
+        if (btnMsg && btnMsgGroup === null) sb.btnGroups.appendChild(sbText(btnMsg, "font-size:12px;color:var(--wf-n-down-text,#ffe082);word-break:break-word;"));
         sb.btnNewGroupBtn.style.display = btnEditing && !btnForm ? "" : "none"; btnFactoryPaint();
         sbT(sb.btnEditBtn, btnEditing ? i18nT('common.done') : i18nT('common.edit_buttons'));
         sb.btnEditBtn.style.background = btnEditing ? "#2e7d32" : "#37474f";

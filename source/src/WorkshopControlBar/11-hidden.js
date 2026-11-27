@@ -22,8 +22,51 @@
         return e;
       }
       function ocLbl(txt, color) {
-        return ocEl("div", "font-size:10px;font-weight:600;letter-spacing:0.08em;color:" + color + ";", txt);
+        return ocEl("div", "font-size:12px;font-weight:600;letter-spacing:0;color:" + color + ";", txt);
       }
+      // A row of the family (redesign batch 1, ux review 2026-11-23): 48 high, no box, a line under it; icon 18, the name 13/600 and its state 12
+      // under it inside the 48, the arrow on the right. The global parts of the board (phone notices, shutdown) are rows, not grey sub-cards.
+      function ocRow(onTap) {
+        var t = ocEl("button", "display:flex;align-items:center;gap:8px;width:100%;min-height:var(--wf-row, 48px);box-sizing:border-box;padding:4px 2px;border:0;border-bottom:1px solid rgba(128,128,128,0.22);border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;touch-action:pan-y;min-width:0;");
+        t.type = "button";
+        t.dataset.ocRow = "1";
+        t.addEventListener("pointerdown", function (ev) { ev.stopPropagation(); ev.preventDefault(); });
+        t.addEventListener("click", function (ev) { ev.stopPropagation(); onTap(); });
+        t._ic = ocEl("span", "width:18px;height:18px;flex:none;display:inline-flex;align-items:center;justify-content:center;color:rgba(128,128,128,0.95);");
+        t.appendChild(t._ic);
+        var mid = ocEl("span", "display:flex;flex-direction:column;justify-content:center;gap:2px;flex:1 1 auto;min-width:0;");
+        t.appendChild(mid);
+        t._tit = ocEl("b", "font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;");
+        mid.appendChild(t._tit);
+        t._est = ocEl("span", "font-size:12px;line-height:1.3;color:#b0bec5;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;");
+        mid.appendChild(t._est);
+        t._chev = ocEl("span", "color:#b0bec5;font-size:15px;flex:none;");
+        t.appendChild(t._chev);
+        return t;
+      }
+
+      // The state line of the shutdown row (ux, 2026-11-24): armed or scheduled is said with a word and an icon in the warning colour (#ffb74d on
+      // dark, #b26a00 on light: data-sb-warn, rule in 10-sidebar-scale.js); the orange divider is only a reinforcement. Written only when it changes.
+      function ocShutdownState(row, timing, armed) {
+        var warn = !!(timing || armed);
+        var txt = timing ? i18nT('hidden.scheduled_at', { time: timing.until }) : armed ? i18nT('hidden.armed_when_the_job_ends') : i18nT('hidden.nothing_scheduled');
+        var key = (warn ? "w" : "n") + "|" + (timing ? "t" : armed ? "a" : "") + "|" + txt;
+        if (row._estKey === key) return;
+        row._estKey = key;
+        row._est.textContent = "";
+        if (warn) {
+          var ic = document.createElement("span");
+          ic.style.cssText = "display:inline-flex;vertical-align:-2px;margin-right:4px;";
+          ic.setAttribute("aria-hidden", "true");
+          ic.innerHTML = sbIconSvg(timing ? "timer" : "power", 14, false);
+          row._est.appendChild(ic);
+        }
+        row._est.appendChild(document.createTextNode(txt));
+        row._est.dataset.sbWarn = warn ? "1" : "";
+        row._est.style.color = warn ? "" : "#b0bec5";
+        row.style.borderBottomColor = warn ? "rgba(255,152,0,0.5)" : "rgba(128,128,128,0.22)";
+      }
+
       // card-button of the board
       function ocTile(onTap) {
         var t = ocEl("button", "display:flex;flex-direction:column;gap:6px;min-height:72px;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid rgba(128,128,128,0.3);background:rgba(128,128,128,0.07);color:#eceff1;font:inherit;text-align:left;cursor:pointer;touch-action:pan-y;min-width:0;");
@@ -38,7 +81,7 @@
         top.appendChild(t._tit);
         t._chev = ocEl("span", "margin-left:auto;color:#b0bec5;font-size:15px;flex:none;");
         top.appendChild(t._chev);
-        t._est = ocEl("span", "font-size:11px;color:#b0bec5;min-width:0;");
+        t._est = ocEl("span", "font-size:12px;color:#b0bec5;min-width:0;");
         t.appendChild(t._est);
         return t;
       }
@@ -71,7 +114,7 @@
         oc.state = ocEl("span", "");
         oc.state.className = "wf-state";
         est.appendChild(oc.state);
-        oc.job = ocEl("span", "font-size:11px;color:#b0bec5;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;");
+        oc.job = ocEl("span", "font-size:12px;color:#b0bec5;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;");
         est.appendChild(oc.job);
         oc.top.appendChild(est);
         var loc = ocEl("div", "display:flex;flex-direction:column;gap:8px;");
@@ -92,24 +135,25 @@
         // abajo: global
         oc.bottom = ocEl("div", "display:none;flex-direction:column;gap:8px;");
         oc.bottom.appendChild(ocLbl(i18nT('hidden.global_affects_everyone'), SIDEBAR_GLOBAL_COLOR));
+        var rows = ocEl("div", "display:flex;flex-direction:column;");
+        oc.bottom.appendChild(rows);
         var gg = ocEl("div", "display:grid;grid-template-columns:1fr 1fr;gap:8px;");
         oc.bottom.appendChild(gg);
         oc.grid = gg; // the tiles other plugins offer are added to it (11-hidden-tiles.js)
         oc.tiles = {};
-        oc.tNotices = ocTile(function () { ocIr("notificationCard"); });
-        oc.tShutdown = ocTile(function () { ocIr("powerCard"); });
-        oc.tNotices.style.gridColumn = oc.tShutdown.style.gridColumn = "span 2";
+        oc.tNotices = ocRow(function () { ocIr("notificationCard"); });
+        oc.tShutdown = ocRow(function () { ocIr("powerCard"); });
         [[oc.tNotices, "bell", i18nT('hidden.notifications')], [oc.tShutdown, "timer", i18nT('sidebar.shutdown')]].forEach(function (x) {
           sbH(x[0]._ic, sbIconSvg(x[1], 18, false));
           sbT(x[0]._tit, x[2]);
           sbT(x[0]._chev, ">");
-          gg.appendChild(x[0]);
+          rows.appendChild(x[0]);
         });
         full.appendChild(oc.bottom);
 
         // fixed footer: Shut down now (the macro asks for confirmation, as always)
         oc.footer = ocEl("div", "flex:none;display:none;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,0.08);");
-        var ap = ocEl("button", "width:100%;height:44px;border-radius:12px;border:none;background:#b71c1c;color:#fff;font:inherit;font-weight:600;font-size:13px;cursor:pointer;", i18nT('sidebar.shut_down_now'));
+        var ap = ocEl("button", "width:100%;height:var(--wf-hit-critical, 48px);border-radius:12px;border:none;background:#c62828;color:#fff;font:inherit;font-weight:600;font-size:13px;cursor:pointer;", i18nT('sidebar.shut_down_now'));
         ap.type = "button";
         ap.title = i18nT('hidden.shuts_down_the_system_and_cuts');
         ap.addEventListener("pointerdown", function (ev) { ev.stopPropagation(); ev.preventDefault(); });
@@ -133,7 +177,7 @@
           B + " [data-sb-help]{display:none!important;}",
           B + " [data-oc-btnsec]{background:transparent!important;padding:0!important;}",
           B + " [data-oc-btnsec]>div:first-child{display:none!important;}",
-          B + " [data-oc-btnsec] [data-btn-group] button{min-height:40px!important;border-radius:10px!important;}",
+          B + " [data-oc-btnsec] [data-btn-group] button{min-height:44px!important;}",
         ].join("\n");
         document.head.appendChild(st);
       }
@@ -164,7 +208,8 @@
         [["", i18nT('hidden.all')]].concat(groups.map(function (g) { return [g.id, g.title]; })).forEach(function (x) {
           var on = x[0] === sel;
           var c = ocEl("button", "", x[1]);
-          c.className = "wf-cat" + (on ? " on" : "");
+          c.className = "wf-cat sb-hit" + (on ? " on" : ""); // a segment of the scale: 32 to the eye, 40 to the finger
+          c.style.minHeight = "var(--wf-size-s, 32px)";
           c.setAttribute("aria-pressed", on ? "true" : "false");
           c.type = "button";
           c.addEventListener("pointerdown", function (ev) { ev.stopPropagation(); ev.preventDefault(); });
@@ -320,11 +365,7 @@
         var sil = sbNoticeMuted();
         sbT(oc.tNotices._est, !sbNotice ? i18nT('hidden.no_data') : sil ? i18nT('hidden.muted') : i18nT('hidden.active'));
         oc.tNotices._est.style.color = sil ? "var(--wf-n-down-text,#ffb74d)" : "#a5d6a7";
-        var arm = sbPowerOffArmed === true;
-        var txt = sbTiming ? i18nT('hidden.scheduled_at', { time: sbTiming.until }) : arm ? i18nT('hidden.armed_when_the_job_ends') : i18nT('hidden.nothing_scheduled');
-        sbT(oc.tShutdown._est, txt);
-        oc.tShutdown._est.style.color = sbTiming || arm ? "var(--wf-n-down-text,#ffb74d)" : "#b0bec5";
-        oc.tShutdown.style.borderColor = sbTiming || arm ? "rgba(255,152,0,0.5)" : "rgba(128,128,128,0.3)";
+        ocShutdownState(oc.tShutdown, sbTiming, sbPowerOffArmed === true);
         ocPaintTiles(); // 11-hidden-tiles.js
         ocHiddenFlags();
       }

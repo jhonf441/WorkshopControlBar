@@ -10,10 +10,18 @@
 
       // A mode button follows the ONE rule of every mode switch (workshopModeSwitchReason, src/_shared/07-modes.js: the same the Printing page asks):
       // the button stays, locked, with the sentence of the session or the role under it. It used to switch for anybody while Printing asked for a
-      // session (owner 2026-11-06). "" for any other button, or when the person may.
+      // session (2026-11-06). "" for any other button, or when the person may.
       function btnModeBlockReason(b) {
         if (!btnModeTarget(b) || typeof workshopModeSwitchReason !== "function") return "";
         return workshopModeSwitchReason();
+      }
+
+      // The short cause a locked mode button shows under its label (no cursor needed): "Requires a session" / "Only technician"
+      function btnModeLockShort() {
+        var a = typeof workshopModeSwitchAccess === "function" ? workshopModeSwitchAccess() : "";
+        if (a === "session") return i18nT("sidebar.lock_short_session");
+        if (a === "role") return i18nT("sidebar.lock_short_role", { role: workshopNoticeRoleName(typeof WORKSHOP_MODE_SWITCH_ROLE !== "undefined" ? WORKSHOP_MODE_SWITCH_ROLE : "technician") });
+        return "";
       }
 
       // waits (at most 10 s) until the model shows the mode; resolves the message to show, true or false in `confirmed`

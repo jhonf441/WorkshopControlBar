@@ -7,7 +7,8 @@
 
       // The button of the bar, shown when the person edits the buttons or when there is no group yet (btnFactoryPaint).
       function btnFactoryButton() {
-        var b = sbMakeButton(i18nT('buttons.factory_add'), "#00897b", function () { btnAddFactory(); });
+        var b = sbMakeButton(i18nT('buttons.factory_add'), "#1976d2", function () { btnAddFactory(); }); // the main action of an empty bar: family blue, 36
+        b.style.minHeight = "var(--wf-size-m, 36px)";
         b.title = i18nT('buttons.factory_tip');
         return b;
       }
